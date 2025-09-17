@@ -10,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ArrowLeft, ArrowRight, Brain, CalendarIcon, ClipboardPaste } from "lucide-react";
-import heLogo from "@/assets/he-logo.png";
+import heLogo from "@/assets/he-logo-new.png";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -236,8 +236,8 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       <div className="px-6 py-8">
         <Card className="bg-gradient-subtle border-0 shadow-premium">
           <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-gold animate-pulse">
-              <img src={heLogo} alt="Haxington Equity" className="w-12 h-12 object-contain" />
+            <div className="flex items-center justify-center w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-gold animate-pulse">
+              <img src={heLogo} alt="Haxington Equity" className="w-20 h-16 object-contain opacity-90" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">Analyzing Your Eligibility</h2>
             <p className="text-muted-foreground mb-6">
@@ -693,7 +693,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             >
               {currentStep === totalSteps ? (
                 <>
-                  <img src={heLogo} alt="HE" className="w-4 h-4 mr-2 object-contain" />
+                  <img src={heLogo} alt="HE" className="w-6 h-4 mr-2 object-contain opacity-90" />
                   Analyze Your Deal
                 </>
               ) : (
