@@ -270,17 +270,28 @@ export function analyzeDeal(dealData: DealData): AnalysisResult {
     .slice(0, 3)
     .forEach(([issue]) => {
       if (issue.includes('credit score')) {
-        recommendations.push('Improve your credit score by paying down existing debts, making all payments on time, and avoiding new credit inquiries. Most lenders require a minimum 620-650 FICO score, with better rates available at 700+. Consider waiting 3-6 months while working on credit improvement before reapplying.');
+        const currentScore = getCreditScore(dealData.creditScore);
+        recommendations.push(`Your current credit score range (${dealData.creditScore}) translates to approximately ${currentScore} FICO. Most lenders require 620-650 minimum, with better rates at 700+. Focus on paying down existing debts, making all payments on time, and avoiding new credit inquiries. Wait 3-6 months while working on credit improvement before reapplying.`);
       } else if (issue.includes('LTV')) {
-        recommendations.push('Reduce your loan-to-value ratio by increasing your down payment. Most lenders cap LTV at 75-90% depending on the deal type. For fix-and-flip properties, aim for 25-30% down payment. This also demonstrates stronger financial commitment to lenders and may unlock better interest rates.');
+        const loanAmount = parseNumericValue(dealData.fundingAmount);
+        const currentValue = parseNumericValue(dealData.currentValue);
+        const currentLTV = currentValue > 0 ? ((loanAmount / currentValue) * 100).toFixed(1) : 'N/A';
+        recommendations.push(`Your current loan-to-value ratio is ${currentLTV}% (loan: $${loanAmount.toLocaleString()}, property value: $${currentValue.toLocaleString()}). Most lenders cap LTV at 75-90%. Consider increasing your down payment to reduce the loan amount to approximately $${(currentValue * 0.75).toLocaleString()} or finding a higher-value property.`);
       } else if (issue.includes('ARV')) {
-        recommendations.push('Your after-repair value projections may be too aggressive. Get a professional appraisal or BPO to validate your ARV estimates. Most lenders limit loan-to-ARV at 70-75%. Consider being more conservative with your ARV or finding properties with higher profit margins.');
+        const loanAmount = parseNumericValue(dealData.fundingAmount);
+        const arvValue = parseNumericValue(dealData.arv);
+        const currentLoanToARV = arvValue > 0 ? ((loanAmount / arvValue) * 100).toFixed(1) : 'N/A';
+        const targetLoanAmount = (arvValue * 0.75).toLocaleString();
+        recommendations.push(`Your loan-to-ARV ratio is ${currentLoanToARV}% (loan: $${loanAmount.toLocaleString()}, ARV: $${arvValue.toLocaleString()}). Most lenders limit this to 70-75%. Either reduce your loan request to approximately $${targetLoanAmount} or get a professional appraisal to validate a higher ARV estimate.`);
       } else if (issue.includes('experience')) {
-        recommendations.push('Build your real estate investment experience by starting with smaller deals, partnering with seasoned investors, or consider wholesaling first. Document any real estate experience you have, including personal home renovations. Some lenders may accept strong construction/contractor backgrounds as relevant experience.');
+        const pastDeals = dealData.pastDeals === 'Yes' ? 'have' : 'have not';
+        const ownProperties = dealData.ownOtherProperties === 'Yes' ? 'do own' : 'do not own';
+        recommendations.push(`You ${pastDeals} completed past deals and ${ownProperties} other properties. Most investor-focused lenders require demonstrated experience. Consider: 1) Partnering with seasoned investors who have 5+ deals, 2) Starting with owner-occupied financing if applicable, 3) Building track record with smaller deals first, or 4) Highlighting any construction/renovation experience you have.`);
       } else if (issue.includes('amount')) {
-        recommendations.push('Adjust your loan amount to fit within lender parameters. If your request is too low, consider bundling multiple properties or finding larger deals. If too high, break the project into phases or find additional equity partners to reduce the loan amount needed.');
+        const requestedAmount = parseNumericValue(dealData.fundingAmount);
+        recommendations.push(`Your requested funding amount of $${requestedAmount.toLocaleString()} falls outside many lender parameters. Review the qualifying lenders above to see their loan ranges. Consider adjusting your loan request, finding properties that fit within common ranges ($75K-$2M), or exploring portfolio lenders for larger amounts.`);
       } else if (issue.includes('purpose')) {
-        recommendations.push('Ensure your funding purpose aligns with the lender\'s specialty. Fix-and-flip lenders focus on quick turnarounds (6-18 months), while DSCR lenders prefer buy-and-hold rental properties. Match your strategy to the right lender type for better approval odds.');
+        recommendations.push(`Your funding purpose "${dealData.fundingPurpose}" may not align with some lender specialties. Fix-and-flip lenders focus on quick turnarounds (6-18 months), while DSCR lenders prefer buy-and-hold rental properties. Ensure your exit strategy matches the lender type you're targeting.`);
       }
     });
 
