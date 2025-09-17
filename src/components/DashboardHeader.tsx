@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, TrendingUp, Clock, User } from "lucide-react";
+import { TrendingUp, Clock, User, Building2 } from "lucide-react";
+import haxingtonLogo from "@/assets/haxington-logo.png";
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -14,8 +15,8 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
       <div className="relative px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-secondary/20 backdrop-blur-sm">
-              <Building2 className="w-5 h-5 text-secondary" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm">
+              <img src={haxingtonLogo} alt="Haxington Equity" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-primary-foreground">Haxington Equity</h1>

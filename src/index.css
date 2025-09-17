@@ -9,47 +9,47 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Haxington Equity Brand Colors */
-    --background: 0 0% 98%;
-    --foreground: 221 39% 11%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
-    --card-foreground: 221 39% 11%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 221 39% 11%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Premium Navy Primary */
-    --primary: 221 39% 11%;
-    --primary-foreground: 0 0% 98%;
+    /* Deep Red Primary */
+    --primary: 344 86% 20%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Gold Accent */
-    --secondary: 43 74% 66%;
-    --secondary-foreground: 221 39% 11%;
+    /* Gold Yellow Accent */
+    --secondary: 50 100% 50%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 43 74% 66%;
-    --accent-foreground: 221 39% 11%;
+    --accent: 50 100% 50%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221 39% 11%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 344 86% 20%;
 
     --radius: 0.75rem;
 
     /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(221 39% 11%) 0%, hsl(221 39% 16%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(43 74% 66%) 0%, hsl(43 84% 76%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(344 86% 20%) 0%, hsl(344 86% 25%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(50 100% 50%) 0%, hsl(50 100% 60%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
 
     /* Premium Shadows */
-    --shadow-premium: 0 10px 40px -12px hsl(221 39% 11% / 0.25);
-    --shadow-gold: 0 8px 32px -8px hsl(43 74% 66% / 0.3);
-    --shadow-card: 0 4px 24px -4px hsl(221 39% 11% / 0.1);
+    --shadow-premium: 0 10px 40px -12px hsl(344 86% 20% / 0.25);
+    --shadow-gold: 0 8px 32px -8px hsl(50 100% 50% / 0.3);
+    --shadow-card: 0 4px 24px -4px hsl(344 86% 20% / 0.1);
 
     /* Smooth Animations */
     --transition-premium: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,34 +72,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark Mode - Premium Navy Theme */
-    --background: 221 39% 6%;
-    --foreground: 0 0% 98%;
+    /* Dark Mode - Deep Red Theme */
+    --background: 344 86% 10%;
+    --foreground: 0 0% 100%;
 
-    --card: 221 39% 8%;
-    --card-foreground: 0 0% 98%;
+    --card: 344 86% 12%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 221 39% 8%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 344 86% 12%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 43 74% 66%;
-    --primary-foreground: 221 39% 11%;
+    --primary: 50 100% 50%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 221 39% 11%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 344 86% 20%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 221 39% 11%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 344 86% 15%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 43 74% 66%;
-    --accent-foreground: 221 39% 11%;
+    --accent: 50 100% 50%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 221 39% 11%;
-    --input: 221 39% 11%;
-    --ring: 43 74% 66%;
+    --border: 344 86% 15%;
+    --input: 344 86% 15%;
+    --ring: 50 100% 50%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
