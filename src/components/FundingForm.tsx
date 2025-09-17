@@ -3,10 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, Brain } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { ArrowLeft, ArrowRight, Brain, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -17,19 +21,33 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [formData, setFormData] = useState({
-    propertyAddress: "",
-    loanType: "",
-    purchasePrice: "",
-    loanAmount: "",
-    downPayment: "",
+    fundingAmount: "",
+    fundingPurpose: "",
     propertyType: "",
-    experience: "",
-    timeline: "",
-    purpose: "",
-    additionalInfo: "",
+    propertiesExperience: "",
+    creditScore: "",
+    bankBalance: "",
+    annualIncome: "",
+    incomeSources: "",
+    financialAssets: [] as string[],
+    propertyAddress: "",
+    propertyInfo: "",
+    propertyDetails: "",
+    underContract: "",
+    ownOtherProperties: "",
+    currentValue: "",
+    repairsNeeded: "",
+    repairLevel: "",
+    rehabCosts: "",
+    arv: "",
+    closingDate: null as Date | null,
+    moneyPlan: "",
+    pastDeals: "",
+    lastDealProfit: "",
+    goodDeal: "",
   });
 
-  const totalSteps = 4;
+  const totalSteps = 6;
   const progress = (currentStep / totalSteps) * 100;
 
   const handleNext = () => {
@@ -59,8 +77,17 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
     }, 3000);
   };
 
-  const updateFormData = (field: string, value: string) => {
+  const updateFormData = (field: string, value: string | string[] | Date | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const toggleAsset = (asset: string) => {
+    setFormData(prev => ({
+      ...prev,
+      financialAssets: prev.financialAssets.includes(asset)
+        ? prev.financialAssets.filter(a => a !== asset)
+        : [...prev.financialAssets, asset]
+    }));
   };
 
   if (isAnalyzing) {
@@ -71,9 +98,9 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-gold animate-pulse">
               <Brain className="w-10 h-10 text-accent-foreground" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Analyzing Your Deal</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Analyzing Your Eligibility</h2>
             <p className="text-muted-foreground mb-6">
-              Our AI is reviewing your submission against 1000+ lender requirements
+              Our AI is reviewing your submission against our funding requirements
             </p>
             <Progress value={66} className="mb-4" />
             <p className="text-sm text-muted-foreground">
@@ -93,8 +120,8 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">Funding Analysis</h1>
-            <p className="text-sm text-muted-foreground">Step {currentStep} of {totalSteps}</p>
+            <h1 className="text-xl font-bold">Investor Funding Eligibility Form</h1>
+            <p className="text-sm text-muted-foreground">Submit your details to find out if you meet our requirements - Step {currentStep} of {totalSteps}</p>
           </div>
         </div>
         <Progress value={progress} className="mb-2" />
@@ -103,85 +130,193 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="text-lg">
-            {currentStep === 1 && "Property Details"}
-            {currentStep === 2 && "Loan Information"}
-            {currentStep === 3 && "Your Experience"}
-            {currentStep === 4 && "Timeline & Goals"}
+            {currentStep === 1 && "Funding Requirements"}
+            {currentStep === 2 && "Financial Profile"}
+            {currentStep === 3 && "Property Information"}
+            {currentStep === 4 && "Property Details"}
+            {currentStep === 5 && "Investment Goals"}
+            {currentStep === 6 && "Deal Analysis"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {currentStep === 1 && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="propertyAddress">Property Address</Label>
-                <Input 
-                  id="propertyAddress"
-                  placeholder="123 Main St, City, State"
-                  value={formData.propertyAddress}
-                  onChange={(e) => updateFormData("propertyAddress", e.target.value)}
-                />
+              <div className="space-y-3">
+                <Label className="text-base font-medium">How much do you need?*</Label>
+                <RadioGroup 
+                  value={formData.fundingAmount} 
+                  onValueChange={(value) => updateFormData("fundingAmount", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="100k-200k" id="r1" />
+                    <Label htmlFor="r1">$100k - $200k</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="201k-500k" id="r2" />
+                    <Label htmlFor="r2">$201k - $500k</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="501k-1m" id="r3" />
+                    <Label htmlFor="r3">$501k - $1M</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="1m-5m" id="r4" />
+                    <Label htmlFor="r4">$1M - $5M</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="5m+" id="r5" />
+                    <Label htmlFor="r5">+5M$</Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="propertyType">Property Type</Label>
-                <Select value={formData.propertyType} onValueChange={(value) => updateFormData("propertyType", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select property type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="single-family">Single Family Home</SelectItem>
-                    <SelectItem value="multi-family">Multi-Family (2-4 units)</SelectItem>
-                    <SelectItem value="commercial">Commercial Property</SelectItem>
-                    <SelectItem value="condo">Condominium</SelectItem>
-                    <SelectItem value="land">Raw Land</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">What do you need funding for?*</Label>
+                <RadioGroup 
+                  value={formData.fundingPurpose} 
+                  onValueChange={(value) => updateFormData("fundingPurpose", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="purchase" id="p1" />
+                    <Label htmlFor="p1">Purchase</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="refinance" id="p2" />
+                    <Label htmlFor="p2">Refinance</Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="purchasePrice">Purchase Price</Label>
-                <Input 
-                  id="purchasePrice"
-                  placeholder="$250,000"
-                  value={formData.purchasePrice}
-                  onChange={(e) => updateFormData("purchasePrice", e.target.value)}
-                />
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">What type of investment property are you funding?*</Label>
+                <RadioGroup 
+                  value={formData.propertyType} 
+                  onValueChange={(value) => updateFormData("propertyType", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="residential" id="t1" />
+                    <Label htmlFor="t1">Residential</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="commercial" id="t2" />
+                    <Label htmlFor="t2">Commercial</Label>
+                  </div>
+                </RadioGroup>
+                <p className="text-sm text-muted-foreground">
+                  Residential: Single Family Units, Multi Family Units<br/>
+                  Commercial: Retail, Warehouse, Office Building, Mixed Use
+                </p>
               </div>
             </>
           )}
 
           {currentStep === 2 && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="loanType">Loan Type</Label>
-                <Select value={formData.loanType} onValueChange={(value) => updateFormData("loanType", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select loan type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fix-flip">Fix & Flip</SelectItem>
-                    <SelectItem value="bridge">Bridge Loan</SelectItem>
-                    <SelectItem value="rental">Long-Term Rental</SelectItem>
-                    <SelectItem value="construction">Construction Loan</SelectItem>
-                    <SelectItem value="commercial">Commercial Loan</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3">
+                <Label className="text-base font-medium">How many properties have you bought or sold?*</Label>
+                <RadioGroup 
+                  value={formData.propertiesExperience} 
+                  onValueChange={(value) => updateFormData("propertiesExperience", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="1-3" id="e1" />
+                    <Label htmlFor="e1">1 - 3</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="4-10" id="e2" />
+                    <Label htmlFor="e2">4 - 10</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="11-20" id="e3" />
+                    <Label htmlFor="e3">11 - 20</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="21+" id="e4" />
+                    <Label htmlFor="e4">21+</Label>
+                  </div>
+                </RadioGroup>
               </div>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">What does your credit look like?*</Label>
+                <RadioGroup 
+                  value={formData.creditScore} 
+                  onValueChange={(value) => updateFormData("creditScore", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="above-720" id="c1" />
+                    <Label htmlFor="c1">Above 720</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="above-680" id="c2" />
+                    <Label htmlFor="c2">Above 680</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="above-640" id="c3" />
+                    <Label htmlFor="c3">Above 640</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="below-640" id="c4" />
+                    <Label htmlFor="c4">Below 640</Label>
+                  </div>
+                </RadioGroup>
+                <p className="text-sm text-muted-foreground">
+                  Loans are based off the property, but credit can still help.
+                </p>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="loanAmount">Requested Loan Amount</Label>
+                <Label htmlFor="bankBalance">What is your average balance in bank?*</Label>
                 <Input 
-                  id="loanAmount"
-                  placeholder="$200,000"
-                  value={formData.loanAmount}
-                  onChange={(e) => updateFormData("loanAmount", e.target.value)}
+                  id="bankBalance"
+                  placeholder="Enter amount"
+                  value={formData.bankBalance}
+                  onChange={(e) => updateFormData("bankBalance", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="downPayment">Down Payment Available</Label>
+                <Label htmlFor="annualIncome">What is your annual income?*</Label>
                 <Input 
-                  id="downPayment"
-                  placeholder="$50,000"
-                  value={formData.downPayment}
-                  onChange={(e) => updateFormData("downPayment", e.target.value)}
+                  id="annualIncome"
+                  placeholder="Enter annual income"
+                  value={formData.annualIncome}
+                  onChange={(e) => updateFormData("annualIncome", e.target.value)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="incomeSources">How many sources of income do you have and what are they?*</Label>
+                <Textarea 
+                  id="incomeSources"
+                  placeholder="Describe your income sources"
+                  value={formData.incomeSources}
+                  onChange={(e) => updateFormData("incomeSources", e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Do you have any financial assets?</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["401K", "Bitcoin", "IRA", "None"].map((asset) => (
+                    <div key={asset} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={asset}
+                        checked={formData.financialAssets.includes(asset)}
+                        onChange={() => toggleAsset(asset)}
+                        className="rounded border border-input"
+                      />
+                      <Label htmlFor={asset}>{asset}</Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}
@@ -189,32 +324,71 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
           {currentStep === 3 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="experience">Real Estate Experience</Label>
-                <Select value={formData.experience} onValueChange={(value) => updateFormData("experience", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your experience level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">First Deal (0 properties)</SelectItem>
-                    <SelectItem value="intermediate">Some Experience (1-5 properties)</SelectItem>
-                    <SelectItem value="experienced">Experienced (6-15 properties)</SelectItem>
-                    <SelectItem value="expert">Expert (16+ properties)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="propertyAddress">What is the address of the property?*</Label>
+                <Input 
+                  id="propertyAddress"
+                  placeholder="Enter property address"
+                  value={formData.propertyAddress}
+                  onChange={(e) => updateFormData("propertyAddress", e.target.value)}
+                />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="purpose">Investment Purpose</Label>
-                <Select value={formData.purpose} onValueChange={(value) => updateFormData("purpose", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="What's your goal?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="flip">Buy, renovate, and sell</SelectItem>
-                    <SelectItem value="rental">Buy and hold for rental income</SelectItem>
-                    <SelectItem value="development">New construction/development</SelectItem>
-                    <SelectItem value="refinance">Refinance existing property</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="propertyInfo">Provide us general information about the property.*</Label>
+                <Textarea 
+                  id="propertyInfo"
+                  placeholder="Enter general property information"
+                  value={formData.propertyInfo}
+                  onChange={(e) => updateFormData("propertyInfo", e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="propertyDetails">Provide us specific information about the property.*</Label>
+                <Textarea 
+                  id="propertyDetails"
+                  placeholder="Enter specific property details"
+                  value={formData.propertyDetails}
+                  onChange={(e) => updateFormData("propertyDetails", e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Is your property under contract?*</Label>
+                <RadioGroup 
+                  value={formData.underContract} 
+                  onValueChange={(value) => updateFormData("underContract", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="uc1" />
+                    <Label htmlFor="uc1">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="uc2" />
+                    <Label htmlFor="uc2">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Do you own any other properties?*</Label>
+                <RadioGroup 
+                  value={formData.ownOtherProperties} 
+                  onValueChange={(value) => updateFormData("ownOtherProperties", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="op1" />
+                    <Label htmlFor="op1">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="op2" />
+                    <Label htmlFor="op2">No</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </>
           )}
@@ -222,26 +396,137 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
           {currentStep === 4 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="timeline">Funding Timeline</Label>
-                <Select value={formData.timeline} onValueChange={(value) => updateFormData("timeline", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="When do you need funding?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="asap">ASAP (within 1 week)</SelectItem>
-                    <SelectItem value="2weeks">Within 2 weeks</SelectItem>
-                    <SelectItem value="month">Within 1 month</SelectItem>
-                    <SelectItem value="flexible">Flexible timing</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="currentValue">What is the current value of the property?*</Label>
+                <Input 
+                  id="currentValue"
+                  placeholder="Enter current property value"
+                  value={formData.currentValue}
+                  onChange={(e) => updateFormData("currentValue", e.target.value)}
+                />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="additionalInfo">Additional Information</Label>
+                <Label htmlFor="repairsNeeded">Are there any repairs needed to be done?*</Label>
                 <Textarea 
-                  id="additionalInfo"
-                  placeholder="Any additional details about your deal, challenges, or specific requirements..."
-                  value={formData.additionalInfo}
-                  onChange={(e) => updateFormData("additionalInfo", e.target.value)}
+                  id="repairsNeeded"
+                  placeholder="Describe any repairs needed"
+                  value={formData.repairsNeeded}
+                  onChange={(e) => updateFormData("repairsNeeded", e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="repairLevel">If yes, what level of repair is comfortable for you?</Label>
+                <Input 
+                  id="repairLevel"
+                  placeholder="Enter comfort level for repairs"
+                  value={formData.repairLevel}
+                  onChange={(e) => updateFormData("repairLevel", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="rehabCosts">What are the rehab costs of the property?*</Label>
+                <Input 
+                  id="rehabCosts"
+                  placeholder="Answer N/A if no repairs are needed"
+                  value={formData.rehabCosts}
+                  onChange={(e) => updateFormData("rehabCosts", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="arv">How would you estimate the ARV of the property?*</Label>
+                <Input 
+                  id="arv"
+                  placeholder="ARV: After-Repair Value. Answer N/A if no repairs are needed"
+                  value={formData.arv}
+                  onChange={(e) => updateFormData("arv", e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          {currentStep === 5 && (
+            <>
+              <div className="space-y-3">
+                <Label className="text-base font-medium">How quickly you need to close?*</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !formData.closingDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.closingDate ? format(formData.closingDate, "PPP") : <span>Choose a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.closingDate || undefined}
+                      onSelect={(date) => updateFormData("closingDate", date || null)}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="moneyPlan">If the deal is successful, what do you plan to do with the money?*</Label>
+                <Textarea 
+                  id="moneyPlan"
+                  placeholder="Describe your plans for the money"
+                  value={formData.moneyPlan}
+                  onChange={(e) => updateFormData("moneyPlan", e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Have you done any deals in the past year?*</Label>
+                <RadioGroup 
+                  value={formData.pastDeals} 
+                  onValueChange={(value) => updateFormData("pastDeals", value)}
+                  className="grid grid-cols-1 gap-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="pd1" />
+                    <Label htmlFor="pd1">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="pd2" />
+                    <Label htmlFor="pd2">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastDealProfit">What was the profit of your last deal?*</Label>
+                <Input 
+                  id="lastDealProfit"
+                  placeholder="Fill out N/A if this is your first deal"
+                  value={formData.lastDealProfit}
+                  onChange={(e) => updateFormData("lastDealProfit", e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          {currentStep === 6 && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="goodDeal">What consists a good deal for you?*</Label>
+                <Textarea 
+                  id="goodDeal"
+                  placeholder="Provide us your preferred % of value, your preferred minimum profit, your preferred minimum cash flow"
+                  value={formData.goodDeal}
+                  onChange={(e) => updateFormData("goodDeal", e.target.value)}
                   rows={4}
                 />
               </div>
@@ -259,7 +544,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
               {currentStep === totalSteps ? (
                 <>
                   <Brain className="w-4 h-4 mr-2" />
-                  Analyze Deal
+                  Analyze Your Deal
                 </>
               ) : (
                 <>
