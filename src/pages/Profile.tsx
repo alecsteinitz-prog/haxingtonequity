@@ -369,10 +369,6 @@ export const ProfilePage = () => {
         <TabsContent value="deals" className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Deal History</h3>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Deal
-            </Button>
           </div>
           
           {deals.length === 0 ? (
@@ -381,9 +377,8 @@ export const ProfilePage = () => {
                 <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">No deals yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Start building your track record by adding your property deals
+                  Complete the funding analysis form to see your deals appear here automatically
                 </p>
-                <Button>Add Your First Deal</Button>
               </CardContent>
             </Card>
           ) : (
