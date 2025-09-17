@@ -5,7 +5,7 @@ import { PostCard } from "./PostCard";
 import { CreatePost } from "./CreatePost";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { TrendingUp, Clock, Edit3 } from "lucide-react";
+import { TrendingUp, Clock, Edit3, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Post {
@@ -245,27 +245,27 @@ export const Feed = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Create Post Button */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Community Feed</h2>
-        {user && (
+      {/* New Post Button - Prominent CTA */}
+      {user && (
+        <div className="text-center">
           <Button
             onClick={() => setShowCreatePost(!showCreatePost)}
             className="flex items-center gap-2"
+            size="lg"
             variant={showCreatePost ? "outline" : "default"}
           >
-            <Edit3 className="h-4 w-4" />
-            {showCreatePost ? "Cancel" : "Share your strategy"}
+            <Plus className="h-5 w-5" />
+            {showCreatePost ? "Cancel" : "New Post"}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Create Post Section */}
       {user && showCreatePost && <CreatePost onPostCreated={handlePostCreated} />}
 
-      {/* Sort Controls */}
+      {/* Header and Sort Controls */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">Sort by:</span>
+        <h2 className="text-xl font-semibold">Community Feed</h2>
         <Select value={sortBy} onValueChange={(value: "latest" | "popular") => setSortBy(value)}>
           <SelectTrigger className="w-40">
             <SelectValue />
