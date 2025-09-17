@@ -13,101 +13,22 @@ interface AnalysisResultsProps {
 
 export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: AnalysisResultsProps) => {
   
-  const calculateDealStructureScore = (result: any) => {
-    let score = 100;
-    
-    // Check loan amount alignment with form data
-    const formData = result.formData || {};
-    const loanAmount = parseFloat(formData.fundingAmount?.replace(/[^0-9.]/g, '') || '0');
-    
-    // Penalize if loan amount is outside common ranges
-    if (loanAmount < 75000) score -= 20;
-    if (loanAmount > 5000000) score -= 25;
-    
-    // Check purpose alignment
-    const purposeScore = result.qualifyingLenders?.length > 0 ? 
-      (result.qualifyingLenders.length / 5) * 40 : 0;
-    
-    return Math.min(100, Math.max(0, Math.round(score * 0.6 + purposeScore)));
+  // Use the actual score breakdown from analysis result
+  const getScoreBreakdown = () => {
+    if (analysisResult?.scoreBreakdown) {
+      return analysisResult.scoreBreakdown;
+    }
+    // Fallback for old data without scoreBreakdown
+    return {
+      dealStructure: Math.min(score + 10, 100),
+      financialReadiness: Math.max(score - 15, 0),
+      experienceLevel: Math.min(score + 5, 100),
+      propertyAnalysis: score,
+      overall: score
+    };
   };
 
-  const calculateFinancialScore = (result: any) => {
-    let score = 100;
-    const formData = result.formData || {};
-    
-    // Credit score assessment based on actual form answer
-    const creditRange = formData.creditScore || '';
-    if (creditRange === 'below-640') score -= 40;
-    else if (creditRange === 'above-640') score -= 20;
-    else if (creditRange === 'above-680') score -= 10;
-    else if (creditRange === 'above-720') score += 10;
-    
-    // Income assessment
-    const income = parseFloat(formData.annualIncome?.replace(/[^0-9.]/g, '') || '0');
-    if (income < 50000) score -= 20;
-    else if (income > 100000) score += 10;
-    
-    // Bank balance assessment
-    const bankBalance = parseFloat(formData.bankBalance?.replace(/[^0-9.]/g, '') || '0');
-    if (bankBalance < 10000) score -= 15;
-    else if (bankBalance > 50000) score += 10;
-    
-    return Math.min(100, Math.max(0, score));
-  };
-
-  const calculateExperienceScore = (result: any) => {
-    let score = 50; // Base score for new investors
-    const formData = result.formData || {};
-    
-    // Past deals experience
-    if (formData.pastDeals === 'Yes') score += 30;
-    
-    // Property ownership experience  
-    if (formData.ownOtherProperties === 'Yes') score += 20;
-    
-    // Properties experience range
-    const propertiesExp = formData.propertiesExperience || '';
-    if (propertiesExp === '1-3') score += 10;
-    else if (propertiesExp === '4-10') score += 20;
-    else if (propertiesExp === '11-20') score += 30;
-    else if (propertiesExp === '21+') score += 40;
-    
-    return Math.min(100, Math.max(0, score));
-  };
-
-  const calculatePropertyScore = (result: any) => {
-    let score = 80; // Base property score
-    const formData = result.formData || {};
-    
-    // LTV calculation
-    const loanAmount = parseFloat(formData.fundingAmount?.replace(/[^0-9.]/g, '') || '0');
-    const currentValue = parseFloat(formData.currentValue?.replace(/[^0-9.]/g, '') || '0');
-    
-    if (currentValue > 0) {
-      const ltv = (loanAmount / currentValue) * 100;
-      if (ltv > 90) score -= 30;
-      else if (ltv > 80) score -= 15;
-      else if (ltv < 70) score += 10;
-    }
-    
-    // ARV analysis for flip properties
-    if (formData.fundingPurpose?.toLowerCase().includes('flip')) {
-      const arv = parseFloat(formData.arv?.replace(/[^0-9.]/g, '') || '0');
-      if (arv > 0) {
-        const loanToArv = (loanAmount / arv) * 100;
-        if (loanToArv > 75) score -= 20;
-        else if (loanToArv < 70) score += 10;
-      }
-    }
-    
-    // Property condition assessment
-    if (formData.repairsNeeded === 'Yes') {
-      const rehabCosts = parseFloat(formData.rehabCosts?.replace(/[^0-9.]/g, '') || '0');
-      if (rehabCosts > currentValue * 0.3) score -= 15; // Major rehab
-    }
-    
-    return Math.min(100, Math.max(0, score));
-  };
+  const scoreBreakdown = getScoreBreakdown();
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
@@ -212,9 +133,9 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
               <div className="flex items-center justify-between">
                 <span className="text-sm">Deal Structure</span>
                 <div className="flex items-center gap-2">
-                  <Progress value={calculateDealStructureScore(analysisResult)} className="w-20 h-2" />
-                  <Badge variant={calculateDealStructureScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
-                    {calculateDealStructureScore(analysisResult)}%
+                  <Progress value={scoreBreakdown.dealStructure} className="w-20 h-2" />
+                  <Badge variant={scoreBreakdown.dealStructure >= 70 ? "default" : "secondary"} className="text-xs">
+                    {scoreBreakdown.dealStructure}%
                   </Badge>
                 </div>
               </div>
@@ -222,9 +143,9 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
               <div className="flex items-center justify-between">
                 <span className="text-sm">Financial Readiness</span>
                 <div className="flex items-center gap-2">
-                  <Progress value={calculateFinancialScore(analysisResult)} className="w-20 h-2" />
-                  <Badge variant={calculateFinancialScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
-                    {calculateFinancialScore(analysisResult)}%
+                  <Progress value={scoreBreakdown.financialReadiness} className="w-20 h-2" />
+                  <Badge variant={scoreBreakdown.financialReadiness >= 70 ? "default" : "secondary"} className="text-xs">
+                    {scoreBreakdown.financialReadiness}%
                   </Badge>
                 </div>
               </div>
@@ -232,9 +153,9 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
               <div className="flex items-center justify-between">
                 <span className="text-sm">Experience Level</span>
                 <div className="flex items-center gap-2">
-                  <Progress value={calculateExperienceScore(analysisResult)} className="w-20 h-2" />
-                  <Badge variant={calculateExperienceScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
-                    {calculateExperienceScore(analysisResult)}%
+                  <Progress value={scoreBreakdown.experienceLevel} className="w-20 h-2" />
+                  <Badge variant={scoreBreakdown.experienceLevel >= 70 ? "default" : "secondary"} className="text-xs">
+                    {scoreBreakdown.experienceLevel}%
                   </Badge>
                 </div>
               </div>
@@ -242,9 +163,9 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
               <div className="flex items-center justify-between">
                 <span className="text-sm">Property Analysis</span>
                 <div className="flex items-center gap-2">
-                  <Progress value={calculatePropertyScore(analysisResult)} className="w-20 h-2" />
-                  <Badge variant={calculatePropertyScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
-                    {calculatePropertyScore(analysisResult)}%
+                  <Progress value={scoreBreakdown.propertyAnalysis} className="w-20 h-2" />
+                  <Badge variant={scoreBreakdown.propertyAnalysis >= 70 ? "default" : "secondary"} className="text-xs">
+                    {scoreBreakdown.propertyAnalysis}%
                   </Badge>
                 </div>
               </div>
