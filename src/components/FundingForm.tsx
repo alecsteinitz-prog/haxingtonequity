@@ -109,7 +109,8 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       
       // Save to database
       try {
-        const { error } = await supabase
+        // Save to deal_analyses table
+        const { error: analysisError } = await supabase
           .from('deal_analyses')
           .insert({
             funding_amount: formData.fundingAmount,
@@ -140,8 +141,29 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             analysis_score: score
           });
 
-        if (error) {
-          console.error('Error saving analysis:', error);
+        if (analysisError) {
+          console.error('Error saving analysis:', analysisError);
+        }
+
+        // Save to deal_history table for the profile page
+        const dealValue = formData.currentValue ? parseFloat(formData.currentValue.replace(/[$,]/g, '')) : null;
+        const { error: dealError } = await supabase
+          .from('deal_history')
+          .insert({
+            user_id: 'mock-user', // Use mock user since auth is disabled
+            property_type: formData.propertyType,
+            city: formData.propertyAddress ? formData.propertyAddress.split(',')[0] : 'Unknown',
+            state: formData.propertyAddress ? formData.propertyAddress.split(',')[1]?.trim() : null,
+            deal_status: 'pending_approval',
+            deal_value: dealValue,
+            close_date: formData.closingDate ? formData.closingDate.toISOString().split('T')[0] : null,
+            profit_amount: null // Will be filled when deal is completed
+          });
+
+        if (dealError) {
+          console.error('Error saving deal history:', dealError);
+        } else {
+          toast.success('Deal added to your history!');
         }
       } catch (error) {
         console.error('Error saving analysis:', error);
