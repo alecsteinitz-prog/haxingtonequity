@@ -28,7 +28,7 @@ export const FundingAnalysisCard = ({ onStartAnalysis, onViewHistory }: FundingA
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div className="p-3 rounded-lg bg-muted/50">
-              <p className="text-2xl font-bold text-foreground">&lt; 2min</p>
+              <p className="text-2xl font-bold text-foreground">&lt; 60 sec</p>
               <p className="text-xs text-muted-foreground">Analysis Time</p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">

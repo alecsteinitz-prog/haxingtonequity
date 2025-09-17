@@ -60,7 +60,7 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
                 </div>
                 <div>
                   <p className="text-xs text-primary-foreground/80">Avg Analysis</p>
-                  <p className="text-lg font-bold text-primary-foreground">&lt; 2min</p>
+                  <p className="text-lg font-bold text-primary-foreground">&lt; 60 sec</p>
                 </div>
               </div>
             </Card>
