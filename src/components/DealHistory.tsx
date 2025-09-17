@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ViewAnswersModal } from "./ViewAnswersModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,11 +12,30 @@ interface DealAnalysis {
   funding_amount: string;
   funding_purpose: string;
   property_type: string;
+  property_details?: string;
+  properties_count: string;
+  credit_score: string;
+  bank_balance?: string;
+  annual_income?: string;
+  income_sources?: string;
+  financial_assets?: string[];
   property_address: string;
+  property_info?: string;
+  property_specific_info?: string;
+  under_contract?: boolean;
+  owns_other_properties?: boolean;
+  current_value?: string;
+  repairs_needed?: boolean;
+  repair_level?: string;
+  rehab_costs?: string;
+  arv_estimate?: string;
+  close_timeline?: string;
+  money_plans?: string;
+  past_deals?: boolean;
+  last_deal_profit?: string;
+  good_deal_criteria?: string;
   analysis_score: number;
   created_at: string;
-  current_value: string;
-  close_timeline: string;
 }
 
 interface DealHistoryProps {
@@ -25,6 +45,8 @@ interface DealHistoryProps {
 export const DealHistory = ({ onBack }: DealHistoryProps) => {
   const [analyses, setAnalyses] = useState<DealAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<DealAnalysis | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchAnalyses();
@@ -44,6 +66,11 @@ export const DealHistory = ({ onBack }: DealHistoryProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewAnswers = (analysis: DealAnalysis) => {
+    setSelectedAnalysis(analysis);
+    setIsModalOpen(true);
   };
 
   const getScoreColor = (score: number) => {
@@ -159,10 +186,7 @@ export const DealHistory = ({ onBack }: DealHistoryProps) => {
                     variant="outline" 
                     size="sm"
                     className="w-full"
-                    onClick={() => {
-                      // TODO: Implement view previous answers functionality
-                      console.log('View answers for analysis:', analysis.id);
-                    }}
+                    onClick={() => handleViewAnswers(analysis)}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     View Previous Answers
@@ -173,6 +197,12 @@ export const DealHistory = ({ onBack }: DealHistoryProps) => {
           ))}
         </div>
       )}
+      
+      <ViewAnswersModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        analysis={selectedAnalysis}
+      />
     </div>
   );
 };
