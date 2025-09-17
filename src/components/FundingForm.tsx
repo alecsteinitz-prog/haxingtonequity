@@ -236,8 +236,8 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       <div className="px-6 py-8">
         <Card className="bg-gradient-subtle border-0 shadow-premium">
           <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-gold animate-pulse">
-              <img src={heLogo} alt="Haxington Equity" className="w-20 h-16 object-contain opacity-90" />
+            <div className="flex items-center justify-center w-24 h-24 mx-auto mb-6">
+              <img src={heLogo} alt="Haxington Equity" className="w-20 h-16 object-contain animate-pulse" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">Analyzing Your Eligibility</h2>
             <p className="text-muted-foreground mb-6">
@@ -693,7 +693,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             >
               {currentStep === totalSteps ? (
                 <>
-                  <img src={heLogo} alt="HE" className="w-6 h-4 mr-2 object-contain opacity-90" />
+                  <img src={heLogo} alt="HE" className="w-6 h-4 mr-2 object-contain" />
                   Analyze Your Deal
                 </>
               ) : (
