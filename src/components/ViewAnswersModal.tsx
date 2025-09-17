@@ -1,6 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 import { format } from "date-fns";
 
 interface DealAnalysis {
@@ -42,6 +45,44 @@ interface ViewAnswersModalProps {
 
 export const ViewAnswersModal = ({ isOpen, onClose, analysis }: ViewAnswersModalProps) => {
   if (!analysis) return null;
+
+  const handleCopyAnswers = async () => {
+    try {
+      // Create a clean object with form field mappings
+      const formData = {
+        fundingAmount: analysis.funding_amount,
+        fundingPurpose: analysis.funding_purpose,
+        propertyType: analysis.property_type,
+        propertyDetails: analysis.property_details || "",
+        propertiesCount: analysis.properties_count,
+        creditScore: analysis.credit_score,
+        bankBalance: analysis.bank_balance || "",
+        annualIncome: analysis.annual_income || "",
+        incomeSources: analysis.income_sources || "",
+        financialAssets: analysis.financial_assets || [],
+        propertyAddress: analysis.property_address,
+        propertyInfo: analysis.property_info || "",
+        propertySpecificInfo: analysis.property_specific_info || "",
+        underContract: analysis.under_contract || false,
+        ownsOtherProperties: analysis.owns_other_properties || false,
+        currentValue: analysis.current_value || "",
+        repairsNeeded: analysis.repairs_needed || false,
+        repairLevel: analysis.repair_level || "",
+        rehabCosts: analysis.rehab_costs || "",
+        arvEstimate: analysis.arv_estimate || "",
+        closeTimeline: analysis.close_timeline || "",
+        moneyPlans: analysis.money_plans || "",
+        pastDeals: analysis.past_deals || false,
+        lastDealProfit: analysis.last_deal_profit || "",
+        goodDealCriteria: analysis.good_deal_criteria || ""
+      };
+
+      await navigator.clipboard.writeText(JSON.stringify(formData, null, 2));
+      toast.success("Answers copied to clipboard! You can now paste them in a new form.");
+    } catch (error) {
+      toast.error("Failed to copy answers to clipboard");
+    }
+  };
 
   const formatAnswer = (value: any) => {
     if (value === null || value === undefined) return "Not provided";
@@ -118,6 +159,15 @@ export const ViewAnswersModal = ({ isOpen, onClose, analysis }: ViewAnswersModal
           <div className="text-sm text-muted-foreground">
             Submitted on {format(new Date(analysis.created_at), "MMM d, yyyy 'at' h:mm a")}
           </div>
+          <Button 
+            onClick={handleCopyAnswers}
+            variant="outline"
+            size="sm"
+            className="mt-2"
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copy All Answers
+          </Button>
         </DialogHeader>
         
         <ScrollArea className="max-h-[60vh] pr-4">

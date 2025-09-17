@@ -9,9 +9,10 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { ArrowLeft, ArrowRight, Brain, CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, CalendarIcon, ClipboardPaste } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -134,6 +135,46 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
     }));
   };
 
+  const handlePasteAnswers = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const pastedData = JSON.parse(clipboardText);
+      
+      // Map the pasted data to form fields
+      const mappedData = {
+        fundingAmount: pastedData.fundingAmount || "",
+        fundingPurpose: pastedData.fundingPurpose || "",
+        propertyType: pastedData.propertyType || "",
+        propertiesExperience: pastedData.propertiesCount || "",
+        creditScore: pastedData.creditScore || "",
+        bankBalance: pastedData.bankBalance || "",
+        annualIncome: pastedData.annualIncome || "",
+        incomeSources: pastedData.incomeSources || "",
+        financialAssets: pastedData.financialAssets || [],
+        propertyAddress: pastedData.propertyAddress || "",
+        propertyInfo: pastedData.propertyInfo || "",
+        propertyDetails: pastedData.propertySpecificInfo || "",
+        underContract: pastedData.underContract ? "yes" : "no",
+        ownOtherProperties: pastedData.ownsOtherProperties ? "yes" : "no",
+        currentValue: pastedData.currentValue || "",
+        repairsNeeded: pastedData.repairsNeeded ? "yes" : "no",
+        repairLevel: pastedData.repairLevel || "",
+        rehabCosts: pastedData.rehabCosts || "",
+        arv: pastedData.arvEstimate || "",
+        closingDate: pastedData.closeTimeline ? new Date(pastedData.closeTimeline) : null,
+        moneyPlan: pastedData.moneyPlans || "",
+        pastDeals: pastedData.pastDeals ? "yes" : "no",
+        lastDealProfit: pastedData.lastDealProfit || "",
+        goodDeal: pastedData.goodDealCriteria || ""
+      };
+      
+      setFormData(prev => ({ ...prev, ...mappedData }));
+      toast.success("Previous answers pasted successfully!");
+    } catch (error) {
+      toast.error("Failed to paste answers. Please make sure you copied valid form data.");
+    }
+  };
+
   if (isAnalyzing) {
     return (
       <div className="px-6 py-8">
@@ -167,6 +208,15 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             <h1 className="text-xl font-bold">Investor Funding Eligibility Form</h1>
             <p className="text-sm text-muted-foreground">Submit your details to find out if you meet our requirements - Step {currentStep} of {totalSteps}</p>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handlePasteAnswers}
+            className="flex items-center gap-2"
+          >
+            <ClipboardPaste className="h-4 w-4" />
+            Paste Previous
+          </Button>
         </div>
         <Progress value={progress} className="mb-2" />
       </div>
