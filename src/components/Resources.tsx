@@ -43,16 +43,18 @@ export const Resources = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
-            onClick={() => {
-              window.open("https://www.youtube.com/@Haxington.Equity", "_blank", "noopener,noreferrer");
-            }}
-            className="w-full bg-red-500 hover:bg-red-600 text-white"
+          <a 
+            href="https://www.youtube.com/@Haxington.Equity" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block w-full"
           >
-            <Youtube className="w-4 h-4 mr-2" />
-            Visit Our YouTube Channel
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Button>
+            <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
+              <Youtube className="w-4 h-4 mr-2" />
+              Visit Our YouTube Channel
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </Button>
+          </a>
         </CardContent>
       </Card>
 
