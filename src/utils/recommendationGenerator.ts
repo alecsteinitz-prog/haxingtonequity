@@ -12,15 +12,15 @@ interface FormData {
   propertyInfo: string;
   propertyDetails: string;
   underContract: string;
-  ownOtherProperties: string;
+  ownOtherProperties: string | boolean;
   currentValue: string;
-  repairsNeeded: string;
+  repairsNeeded: string | boolean;
   repairLevel: string;
   rehabCosts: string;
   arv: string;
   closingDate: Date | null;
   moneyPlan: string;
-  pastDeals: string;
+  pastDeals: string | boolean;
   lastDealProfit: string;
   goodDeal: string;
 }
@@ -129,8 +129,8 @@ function generateFinancialRecommendation(formData: FormData, score: number): str
 
 function generateExperienceRecommendation(formData: FormData, score: number): string {
   if (score < 70) {
-    const hasPastDeals = formData.pastDeals === 'Yes';
-    const ownsOtherProperties = formData.ownOtherProperties === 'Yes';
+    const hasPastDeals = formData.pastDeals === 'Yes' || formData.pastDeals === 'yes' || formData.pastDeals === true;
+    const ownsOtherProperties = formData.ownOtherProperties === 'Yes' || formData.ownOtherProperties === 'yes' || formData.ownOtherProperties === true;
     
     if (!hasPastDeals && !ownsOtherProperties) {
       return `As a first-time real estate investor (no past deals, no current properties), consider: 1) Partnering with an experienced investor who has completed 5+ deals, 2) Starting with a smaller, less complex property to build track record, 3) Documenting any construction, renovation, or property management experience, or 4) Exploring owner-occupied financing options first.`;
@@ -157,6 +157,7 @@ function generatePropertyRecommendation(formData: FormData, score: number): stri
   const currentValue = parseNumericValue(formData.currentValue);
   const rehabCosts = parseNumericValue(formData.rehabCosts);
   const arv = parseNumericValue(formData.arv);
+  const needsRepairs = formData.repairsNeeded === 'Yes' || formData.repairsNeeded === 'yes' || formData.repairsNeeded === true;
   
   if (score < 70) {
     if (currentValue > 0) {
@@ -166,7 +167,7 @@ function generatePropertyRecommendation(formData: FormData, score: number): stri
       }
     }
     
-    if (formData.repairsNeeded === 'Yes' && rehabCosts > 0 && currentValue > 0) {
+    if (needsRepairs && rehabCosts > 0 && currentValue > 0) {
       const repairRatio = (rehabCosts / currentValue) * 100;
       if (repairRatio > 25) {
         return `Your repair costs ($${rehabCosts.toLocaleString()}) represent ${repairRatio.toFixed(1)}% of the property value. Most lenders prefer rehab costs under 25% of property value. Consider properties requiring less extensive renovation or get detailed contractor estimates to justify the scope.`;
@@ -203,7 +204,8 @@ export function generateSuccessMessages(formData: FormData, scores: ScoreBreakdo
     
     if (scores.experienceLevel >= 80) {
       const experience = formData.propertiesExperience || 'some';
-      messages.push(`Your real estate experience (${experience} properties, ${formData.pastDeals === 'Yes' ? 'with' : 'without'} past deals) demonstrates capability to execute this investment.`);
+      const hasPastDeals = formData.pastDeals === 'Yes' || formData.pastDeals === 'yes' || formData.pastDeals === true;
+      messages.push(`Your real estate experience (${experience} properties, ${hasPastDeals ? 'with' : 'without'} past deals) demonstrates capability to execute this investment.`);
     }
     
     if (scores.dealStructure >= 85) {

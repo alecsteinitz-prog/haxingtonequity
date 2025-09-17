@@ -12,15 +12,15 @@ interface FormData {
   propertyInfo: string;
   propertyDetails: string;
   underContract: string;
-  ownOtherProperties: string;
+  ownOtherProperties: string | boolean;
   currentValue: string;
-  repairsNeeded: string;
+  repairsNeeded: string | boolean;
   repairLevel: string;
   rehabCosts: string;
   arv: string;
   closingDate: Date | null;
   moneyPlan: string;
-  pastDeals: string;
+  pastDeals: string | boolean;
   lastDealProfit: string;
   goodDeal: string;
 }
@@ -141,14 +141,18 @@ export function calculateExperienceLevelScore(formData: FormData): number {
   let score = 0;
 
   // Past Real Estate Deals (40 points)
-  if (formData.pastDeals === 'Yes') {
+  // Handle both boolean and string values
+  const hasPastDeals = formData.pastDeals === 'Yes' || formData.pastDeals === 'yes' || formData.pastDeals === true;
+  if (hasPastDeals) {
     score += 40;
   } else {
     score += 5; // New investor base
   }
 
   // Property Ownership Experience (30 points)
-  if (formData.ownOtherProperties === 'Yes') {
+  // Handle both boolean and string values
+  const ownsOtherProperties = formData.ownOtherProperties === 'Yes' || formData.ownOtherProperties === 'yes' || formData.ownOtherProperties === true;
+  if (ownsOtherProperties) {
     score += 30;
   } else {
     score += 10; // First-time property owner
@@ -185,7 +189,8 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   }
 
   // ARV Analysis for Fix & Flip (25 points)
-  if (formData.fundingPurpose.toLowerCase().includes('flip') || formData.repairsNeeded === 'Yes') {
+  const needsRepairs = formData.repairsNeeded === 'Yes' || formData.repairsNeeded === 'yes' || formData.repairsNeeded === true;
+  if (formData.fundingPurpose.toLowerCase().includes('flip') || needsRepairs) {
     const arv = parseNumericValue(formData.arv);
     if (arv > 0) {
       const loanToArv = (loanAmount / arv) * 100;
@@ -201,7 +206,7 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   }
 
   // Repair Cost Analysis (25 points)
-  if (formData.repairsNeeded === 'Yes') {
+  if (needsRepairs) {
     const rehabCosts = parseNumericValue(formData.rehabCosts);
     if (currentValue > 0 && rehabCosts > 0) {
       const repairRatio = (rehabCosts / currentValue) * 100;
