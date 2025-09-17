@@ -254,12 +254,12 @@ export const ProfilePage = () => {
                   value={profile.profile_bio || ''}
                   onChange={(e) => setProfile({ ...profile, profile_bio: e.target.value })}
                   rows={6}
-                  maxLength={500}
+                  maxLength={2000}
                   className="w-full"
                 />
                 <div className="flex justify-between items-center text-xs text-muted-foreground">
                   <span>Professional bio for potential investors</span>
-                  <span>{(profile.profile_bio?.length || 0)}/500 characters</span>
+                  <span>{(profile.profile_bio?.length || 0)}/2000 characters</span>
                 </div>
               </div>
             ) : (
