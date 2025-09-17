@@ -194,7 +194,7 @@ export const ProfilePage = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Profile Header */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-6">
         <div className="relative inline-block">
           <Avatar className="h-32 w-32 mx-auto">
             <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
@@ -224,133 +224,60 @@ export const ProfilePage = () => {
             @{profile.display_name.toLowerCase().replace(/\s+/g, '')}
           </h5>
         </div>
+
+        {/* Professional About Me Section */}
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-lg">About Me</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {editMode ? (
+              <div className="space-y-2">
+                <Textarea
+                  placeholder="Write your professional bio here... Tell potential investors about your background, experience, and investment goals."
+                  value={profile.profile_bio || ''}
+                  onChange={(e) => setProfile({ ...profile, profile_bio: e.target.value })}
+                  rows={6}
+                  maxLength={500}
+                  className="w-full"
+                />
+                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                  <span>Professional bio for potential investors</span>
+                  <span>{(profile.profile_bio?.length || 0)}/500 characters</span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                {profile.profile_bio ? (
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                    {profile.profile_bio}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    No professional bio added yet. Click "Edit Profile" to add your professional background and investment goals.
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         
         <div className="flex justify-center">
           <Button 
             variant={editMode ? "outline" : "default"}
-            onClick={() => setEditMode(!editMode)}
+            onClick={() => editMode ? updateProfile(profile) : setEditMode(true)}
           >
-            {editMode ? "Cancel" : "Edit Profile"}
+            {editMode ? "Save Changes" : "Edit Profile"}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs defaultValue="experience" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="experience">Experience</TabsTrigger>
           <TabsTrigger value="deals">Deal History</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          {/* Profile Details */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="flex justify-center">
-                  {profile.actively_seeking_funding ? (
-                    <Badge variant="default" className="bg-green-100 text-green-800">
-                      Actively Seeking Funding
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary">Not Seeking Funding</Badge>
-                  )}
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-muted-foreground mb-2">{profile.email}</p>
-                  
-                  {profile.funding_eligibility_score && (
-                    <div className="flex items-center justify-center space-x-2 mb-4">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">
-                        Eligibility Score: {profile.funding_eligibility_score}%
-                      </span>
-                      {profile.last_eligibility_update && (
-                        <span className="text-xs text-muted-foreground">
-                          (Updated {new Date(profile.last_eligibility_update).toLocaleDateString()})
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="text-sm text-foreground">
-                    {profile.profile_bio || "No bio provided yet."}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Edit Profile Form */}
-          {editMode && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Profile</CardTitle>
-                <CardDescription>Update your profile information</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={profile.first_name}
-                      onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={profile.last_name}
-                      onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="displayName">Display Name</Label>
-                  <Input
-                    id="displayName"
-                    value={profile.display_name}
-                    onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="bio">Profile Bio</Label>
-                  <Textarea
-                    id="bio"
-                    placeholder="Tell us about yourself and your investment goals..."
-                    value={profile.profile_bio || ''}
-                    onChange={(e) => setProfile({ ...profile, profile_bio: e.target.value })}
-                    rows={3}
-                    maxLength={200}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {(profile.profile_bio?.length || 0)}/200 characters
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="seekingFunding"
-                    checked={profile.actively_seeking_funding}
-                    onCheckedChange={(checked) => 
-                      setProfile({ ...profile, actively_seeking_funding: checked })
-                    }
-                  />
-                  <Label htmlFor="seekingFunding">Actively seeking funding</Label>
-                </div>
-                
-                <Button onClick={() => updateProfile(profile)} className="w-full">
-                  Save Changes
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
 
         <TabsContent value="experience" className="space-y-4">
           <Card>
@@ -405,6 +332,20 @@ export const ProfilePage = () => {
                   ))}
                 </div>
               </div>
+
+              {profile.funding_eligibility_score && (
+                <div className="flex items-center justify-center space-x-2 p-4 bg-muted rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <span className="font-medium">
+                    Funding Eligibility Score: {profile.funding_eligibility_score}%
+                  </span>
+                  {profile.last_eligibility_update && (
+                    <span className="text-sm text-muted-foreground">
+                      (Updated {new Date(profile.last_eligibility_update).toLocaleDateString()})
+                    </span>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -437,7 +378,73 @@ export const ProfilePage = () => {
             </div>
           )}
         </TabsContent>
+
+        <TabsContent value="settings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Settings</CardTitle>
+              <CardDescription>Update your basic profile information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={profile.first_name}
+                    onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+                    disabled={!editMode}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={profile.last_name}
+                    onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+                    disabled={!editMode}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="displayName">Username</Label>
+                <Input
+                  id="displayName"
+                  value={profile.display_name}
+                  onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+                  disabled={!editMode}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  value={profile.email}
+                  disabled
+                  className="bg-muted"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Email cannot be changed
+                </p>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="seekingFunding"
+                  checked={profile.actively_seeking_funding}
+                  onCheckedChange={(checked) => 
+                    setProfile({ ...profile, actively_seeking_funding: checked })
+                  }
+                  disabled={!editMode}
+                />
+                <Label htmlFor="seekingFunding">Actively seeking funding</Label>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
-    </div>
-  );
-};
+     </div>
+   );
+ };
