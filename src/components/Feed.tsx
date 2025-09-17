@@ -245,6 +245,17 @@ export const Feed = () => {
 
   return (
     <div className="space-y-6">
+      {/* Authentication prompt for non-signed-in users */}
+      {!user && (
+        <div className="text-center py-8 bg-card rounded-lg border">
+          <h3 className="text-lg font-semibold mb-2">Join the Community</h3>
+          <p className="text-muted-foreground mb-4">Sign in to share strategies and engage with other investors</p>
+          <Button asChild>
+            <a href="/auth">Sign In / Sign Up</a>
+          </Button>
+        </div>
+      )}
+
       {/* New Post Button - Prominent CTA */}
       {user && (
         <div className="text-center">
