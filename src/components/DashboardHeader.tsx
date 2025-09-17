@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Clock, User, Building2 } from "lucide-react";
+import { TrendingUp, DollarSign, Users, User, Building2 } from "lucide-react";
 import haxingtonLogo from "@/assets/haxington-logo.png";
 
 interface DashboardHeaderProps {
@@ -44,11 +44,12 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/20">
-                  <TrendingUp className="w-4 h-4 text-secondary" />
+                  <DollarSign className="w-4 h-4 text-secondary" />
                 </div>
                 <div>
-                  <p className="text-xs text-primary-foreground/80">Success Rate</p>
-                  <p className="text-lg font-bold text-primary-foreground">94%</p>
+                  <p className="text-xs text-primary-foreground/80">Amount Transacted</p>
+                  <p className="text-lg font-bold text-primary-foreground">$50M+</p>
+                  <p className="text-xs text-primary-foreground/60">past 12 months</p>
                 </div>
               </div>
             </Card>
@@ -56,11 +57,11 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/20">
-                  <Clock className="w-4 h-4 text-secondary" />
+                  <Users className="w-4 h-4 text-secondary" />
                 </div>
                 <div>
-                  <p className="text-xs text-primary-foreground/80">Avg Analysis</p>
-                  <p className="text-lg font-bold text-primary-foreground">&lt; 60 sec</p>
+                  <p className="text-xs text-primary-foreground/80">Recurring Clients</p>
+                  <p className="text-lg font-bold text-primary-foreground">95%</p>
                 </div>
               </div>
             </Card>
@@ -71,8 +72,8 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
                   <Building2 className="w-4 h-4 text-secondary" />
                 </div>
                 <div>
-                  <p className="text-xs text-primary-foreground/80">Funded</p>
-                  <p className="text-lg font-bold text-primary-foreground">$2.4B+</p>
+                  <p className="text-xs text-primary-foreground/80">Successful Deals</p>
+                  <p className="text-lg font-bold text-primary-foreground">250+</p>
                 </div>
               </div>
             </Card>
