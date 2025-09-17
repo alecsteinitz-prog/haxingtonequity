@@ -49,21 +49,17 @@ const App = () => {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Index />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout>
+                <Index />
+              </AppLayout>
             }
           />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <ProfilePage />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout>
+                <ProfilePage />
+              </AppLayout>
             }
           />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
