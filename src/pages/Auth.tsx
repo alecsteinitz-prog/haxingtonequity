@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import haxingtonLogo from '@/assets/haxington-equity-logo.png';
 
 export const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -80,8 +81,11 @@ export const AuthPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome to Haxington</h1>
-          <p className="text-muted-foreground">Real Estate Investment Funding Platform</p>
+          <img 
+            src={haxingtonLogo} 
+            alt="Haxington Equity" 
+            className="h-20 mx-auto mb-4" 
+          />
         </div>
 
         <Tabs defaultValue="signin" className="w-full">
