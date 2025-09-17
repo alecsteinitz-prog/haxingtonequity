@@ -22,57 +22,56 @@ export const Resources = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto px-6 py-8 space-y-12">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Learning Resources</h1>
-        <p className="text-muted-foreground">
-          Expand your real estate investment knowledge with our curated content
+      <div className="text-center space-y-4 py-8">
+        <h1 className="text-4xl font-bold text-foreground tracking-tight">Learning Resources</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Expand your real estate investment knowledge with our curated content and expert insights
         </p>
       </div>
 
-
       {/* Blog Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold text-foreground">Latest Blog Posts</h2>
+      <div className="space-y-8">
+        <div className="flex items-center gap-3 pb-2">
+          <BookOpen className="w-6 h-6 text-primary" />
+          <h2 className="text-2xl font-semibold text-foreground">Latest Blog Posts</h2>
         </div>
         
-        <div className="grid gap-4">
+        <div className="grid gap-8">
           {blogPosts.map((post, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="flex flex-col sm:flex-row">
-                <div className="sm:w-1/3">
+            <Card key={index} className="hover:shadow-xl transition-all duration-300 cursor-pointer group border-0 shadow-lg">
+              <div className="flex flex-col lg:flex-row overflow-hidden">
+                <div className="lg:w-2/5">
                   <img 
                     src={post.image} 
                     alt={post.title}
-                    className="w-full h-48 sm:h-full object-cover rounded-t-lg sm:rounded-l-lg sm:rounded-t-none"
+                    className="w-full h-64 lg:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="sm:w-2/3 p-6">
-                  <CardHeader className="p-0 pb-4">
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                <div className="lg:w-3/5 p-8 lg:p-10">
+                  <CardHeader className="p-0 pb-6">
+                    <CardTitle className="text-xl lg:text-2xl font-semibold group-hover:text-primary transition-colors duration-200 leading-tight">
                       {post.title}
                     </CardTitle>
-                    <CardDescription className="text-sm">
+                    <CardDescription className="text-base text-muted-foreground leading-relaxed mt-3">
                       {post.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-between pt-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="w-4 h-4" />
                         {post.readTime}
                       </div>
                       <Button 
                         variant="outline" 
-                        size="sm"
+                        size="default"
                         onClick={() => window.open(post.url, "_blank")}
-                        className="hover:bg-primary hover:text-primary-foreground"
+                        className="hover:bg-primary hover:text-primary-foreground transition-all duration-200 px-6"
                       >
                         Read More
-                        <ExternalLink className="w-3 h-3 ml-1" />
+                        <ExternalLink className="w-4 h-4 ml-2" />
                       </Button>
                     </div>
                   </CardContent>
@@ -83,29 +82,30 @@ export const Resources = () => {
         </div>
 
         {/* View All Blog Posts Button */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-8">
           <Button 
             variant="outline"
+            size="lg"
             onClick={() => window.open("https://www.haxingtonequity.com/blog", "_blank")}
-            className="hover:bg-primary hover:text-primary-foreground"
+            className="hover:bg-primary hover:text-primary-foreground transition-all duration-200 px-8 py-6"
           >
-            <BookOpen className="w-4 h-4 mr-2" />
+            <BookOpen className="w-5 h-5 mr-3" />
             View All Blog Posts
-            <ExternalLink className="w-4 h-4 ml-2" />
+            <ExternalLink className="w-5 h-5 ml-3" />
           </Button>
         </div>
       </div>
 
       {/* Educational Topics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Popular Topics</CardTitle>
-          <CardDescription>
-            Key areas we cover in our educational content
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="pb-8 pt-8 px-8">
+          <CardTitle className="text-2xl font-semibold">Popular Topics</CardTitle>
+          <CardDescription className="text-base text-muted-foreground mt-2 leading-relaxed">
+            Key areas we cover in our educational content to help you succeed in real estate investing
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
+        <CardContent className="px-8 pb-8">
+          <div className="flex flex-wrap gap-3">
             {[
               "Off-Market Properties",
               "Direct Mail Marketing", 
@@ -117,7 +117,11 @@ export const Resources = () => {
               "Fix & Flip",
               "Buy & Hold"
             ].map((topic) => (
-              <Badge key={topic} variant="secondary" className="text-sm">
+              <Badge 
+                key={topic} 
+                variant="secondary" 
+                className="text-sm px-4 py-2 font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-200 cursor-pointer"
+              >
                 {topic}
               </Badge>
             ))}
