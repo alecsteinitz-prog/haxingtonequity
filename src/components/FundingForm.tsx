@@ -70,9 +70,11 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const handleSubmit = async () => {
     setIsAnalyzing(true);
     
-    // Simulate AI analysis
+    // Perform real lender analysis
     setTimeout(async () => {
-      const mockScore = Math.floor(Math.random() * 40) + 60; // Random score between 60-100
+      const { analyzeDeal } = await import('../utils/lenderAnalysis');
+      const analysisResult = analyzeDeal(formData);
+      const score = Math.round(analysisResult.overallScore);
       
       // Save to database
       try {
@@ -104,7 +106,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             past_deals: formData.pastDeals === 'Yes',
             last_deal_profit: formData.lastDealProfit,
             good_deal_criteria: formData.goodDeal,
-            analysis_score: mockScore
+            analysis_score: score
           });
 
         if (error) {
@@ -115,7 +117,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       }
       
       setIsAnalyzing(false);
-      onSubmit({ ...formData, score: mockScore });
+      onSubmit({ ...formData, score, analysisResult });
     }, 3000);
   };
 

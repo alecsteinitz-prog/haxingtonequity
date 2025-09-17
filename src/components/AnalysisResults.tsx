@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw } from "lucide-react";
@@ -8,9 +8,10 @@ interface AnalysisResultsProps {
   score: number;
   onBack: () => void;
   onResubmit: () => void;
+  analysisResult?: any;
 }
 
-export const AnalysisResults = ({ score, onBack, onResubmit }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: AnalysisResultsProps) => {
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
@@ -24,12 +25,17 @@ export const AnalysisResults = ({ score, onBack, onResubmit }: AnalysisResultsPr
   };
 
   const getScoreMessage = (score: number) => {
-    if (score >= 80) return "Excellent! Your deal is ready for funding.";
-    if (score >= 60) return "Good foundation with some improvements needed.";
-    return "This deal needs significant adjustments.";
+    const qualifyingCount = analysisResult?.qualifyingLenders?.length || 0;
+    if (score >= 80) return `Excellent! You qualify with ${qualifyingCount} lenders.`;
+    if (score >= 60) return `Good foundation. You qualify with ${qualifyingCount} lenders.`;
+    return qualifyingCount > 0 ? `You qualify with ${qualifyingCount} lenders but need improvements.` : "This deal needs significant adjustments to qualify.";
   };
 
   const getRecommendations = (score: number) => {
+    if (analysisResult?.recommendations?.length > 0) {
+      return analysisResult.recommendations;
+    }
+    
     if (score >= 80) {
       return [
         "Your deal structure is solid",
@@ -146,6 +152,40 @@ export const AnalysisResults = ({ score, onBack, onResubmit }: AnalysisResultsPr
           </div>
         </CardContent>
       </Card>
+
+      {/* Qualifying Lenders */}
+      {analysisResult?.qualifyingLenders?.length > 0 && (
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="text-lg">Qualifying Lenders</CardTitle>
+            <CardDescription>
+              Lenders that match your deal criteria
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {analysisResult.qualifyingLenders.slice(0, 3).map((match: any, index: number) => (
+              <div key={index} className="p-4 border rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">{match.lender.name}</h4>
+                  <Badge variant="default">{match.score}% Match</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Focus: {match.lender.focus.join(", ")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Rates: {match.lender.rates.min}%-{match.lender.rates.max}% | 
+                  Loan Range: ${(match.lender.minLoanAmount / 1000).toFixed(0)}K-${(match.lender.maxLoanAmount / 1000000).toFixed(1)}M
+                </p>
+                {match.strengths.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-green-600 font-medium">✓ {match.strengths[0]}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recommendations */}
       <Card className="shadow-card">

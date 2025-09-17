@@ -70,6 +70,7 @@ const Index = () => {
             score={analysisData?.score || 75}
             onBack={handleBackToDashboard}
             onResubmit={handleResubmit}
+            analysisResult={analysisData?.analysisResult}
           />
         );
       case "history":
