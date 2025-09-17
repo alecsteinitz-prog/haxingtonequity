@@ -50,103 +50,87 @@ function getCreditScorePoints(creditRange: string): number {
 
 export function calculateDealStructureScore(formData: FormData): number {
   let score = 0;
-  let maxPoints = 0;
+  let maxPoints = 100;
 
-  // Loan Amount Appropriateness (25 points)
+  // Loan Amount Appropriateness (30 points)
   const loanAmount = parseNumericValue(formData.fundingAmount);
-  maxPoints += 25;
   if (loanAmount >= 75000 && loanAmount <= 2000000) {
-    score += 25; // Sweet spot for most lenders
+    score += 30; // Optimal range
   } else if (loanAmount >= 50000 && loanAmount <= 5000000) {
-    score += 15; // Acceptable range
-  } else {
-    score += 5; // Outside typical ranges
+    score += 20; // Acceptable range
+  } else if (loanAmount > 0) {
+    score += 10; // Outside optimal but valid
   }
 
-  // Purpose Clarity (25 points)
-  maxPoints += 25;
-  if (formData.fundingPurpose === 'purchase' || formData.fundingPurpose === 'refinance') {
-    score += 25; // Clear purpose
-  } else {
-    score += 10; // Unclear purpose
-  }
-
-  // Property Type Alignment (25 points)
-  maxPoints += 25;
-  if (formData.propertyType === 'residential' || formData.propertyType === 'commercial') {
-    score += 25; // Standard investment types
-  } else {
-    score += 10; // Other types
-  }
-
-  // LTV Ratio (25 points)
-  maxPoints += 25;
+  // LTV Ratio Analysis (40 points)
   const currentValue = parseNumericValue(formData.currentValue);
-  if (currentValue > 0) {
+  if (currentValue > 0 && loanAmount > 0) {
     const ltv = (loanAmount / currentValue) * 100;
-    if (ltv <= 70) score += 25;
-    else if (ltv <= 80) score += 20;
-    else if (ltv <= 90) score += 15;
-    else score += 5;
+    if (ltv <= 70) score += 40;      // Excellent LTV
+    else if (ltv <= 75) score += 35; // Very good LTV
+    else if (ltv <= 80) score += 30; // Good LTV
+    else if (ltv <= 85) score += 20; // Acceptable LTV
+    else if (ltv <= 90) score += 10; // High LTV
+    else score += 5;                 // Very high LTV
   } else {
-    score += 10; // No property value provided
+    score += 15; // Partial credit for incomplete data
   }
 
-  return Math.round((score / maxPoints) * 100);
+  // Purpose and Property Type Alignment (30 points)
+  if (formData.fundingPurpose === 'purchase' || formData.fundingPurpose === 'refinance') {
+    score += 15; // Clear purpose
+  }
+  if (formData.propertyType === 'residential' || formData.propertyType === 'commercial') {
+    score += 15; // Standard investment types
+  }
+
+  return Math.min(100, score);
 }
 
 export function calculateFinancialReadinessScore(formData: FormData): number {
   let score = 0;
-  let maxPoints = 0;
 
   // Credit Score (30 points)
-  maxPoints += 30;
   const creditPoints = getCreditScorePoints(formData.creditScore);
   score += (creditPoints / 100) * 30;
 
   // Annual Income (25 points)
-  maxPoints += 25;
   const income = parseNumericValue(formData.annualIncome);
   if (income >= 150000) score += 25;
   else if (income >= 100000) score += 20;
   else if (income >= 75000) score += 15;
   else if (income >= 50000) score += 10;
-  else score += 5;
+  else if (income > 0) score += 5;
 
   // Bank Balance (25 points)
-  maxPoints += 25;
   const bankBalance = parseNumericValue(formData.bankBalance);
   if (bankBalance >= 100000) score += 25;
   else if (bankBalance >= 50000) score += 20;
   else if (bankBalance >= 25000) score += 15;
   else if (bankBalance >= 10000) score += 10;
-  else score += 5;
+  else if (bankBalance > 0) score += 5;
 
   // Financial Assets Diversity (20 points)
-  maxPoints += 20;
   const assetsCount = formData.financialAssets.filter(asset => asset !== 'None').length;
   if (assetsCount >= 3) score += 20;
   else if (assetsCount >= 2) score += 15;
   else if (assetsCount >= 1) score += 10;
   else score += 5;
 
-  return Math.round((score / maxPoints) * 100);
+  return Math.min(100, Math.round(score));
 }
 
 export function calculateExperienceLevelScore(formData: FormData): number {
   let score = 0;
-  let maxPoints = 0;
 
   // Past Real Estate Deals (40 points)
-  maxPoints += 40;
   if (formData.pastDeals === 'Yes') {
     score += 40;
   } else {
-    score += 5; // New investor penalty
+    score += 5; // New investor base
   }
 
   // Property Ownership Experience (30 points)
-  maxPoints += 30;
   if (formData.ownOtherProperties === 'Yes') {
     score += 30;
   } else {
@@ -154,7 +138,6 @@ export function calculateExperienceLevelScore(formData: FormData): number {
   }
 
   // Transaction Volume Experience (30 points)
-  maxPoints += 30;
   switch (formData.propertiesExperience) {
     case '21+': score += 30; break;
     case '11-20': score += 25; break;
@@ -163,15 +146,13 @@ export function calculateExperienceLevelScore(formData: FormData): number {
     default: score += 5; break;
   }
 
-  return Math.round((score / maxPoints) * 100);
+  return Math.min(100, score);
 }
 
 export function calculatePropertyAnalysisScore(formData: FormData): number {
   let score = 0;
-  let maxPoints = 0;
 
   // LTV Analysis (30 points)
-  maxPoints += 30;
   const loanAmount = parseNumericValue(formData.fundingAmount);
   const currentValue = parseNumericValue(formData.currentValue);
   if (currentValue > 0) {
@@ -187,7 +168,6 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   }
 
   // ARV Analysis for Fix & Flip (25 points)
-  maxPoints += 25;
   if (formData.fundingPurpose.toLowerCase().includes('flip') || formData.repairsNeeded === 'Yes') {
     const arv = parseNumericValue(formData.arv);
     if (arv > 0) {
@@ -204,7 +184,6 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   }
 
   // Repair Cost Analysis (25 points)
-  maxPoints += 25;
   if (formData.repairsNeeded === 'Yes') {
     const rehabCosts = parseNumericValue(formData.rehabCosts);
     if (currentValue > 0 && rehabCosts > 0) {
@@ -221,7 +200,6 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   }
 
   // Property Details Completeness (20 points)
-  maxPoints += 20;
   let completenessScore = 0;
   if (formData.propertyAddress.trim()) completenessScore += 5;
   if (formData.propertyInfo.trim()) completenessScore += 5;
@@ -229,7 +207,7 @@ export function calculatePropertyAnalysisScore(formData: FormData): number {
   if (formData.currentValue.trim()) completenessScore += 5;
   score += completenessScore;
 
-  return Math.round((score / maxPoints) * 100);
+  return Math.min(100, score);
 }
 
 export function calculateOverallScore(breakdown: Omit<ScoreBreakdown, 'overall'>): number {

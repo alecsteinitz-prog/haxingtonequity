@@ -40,10 +40,18 @@ function parseNumericValue(value: string): number {
 
 export function generateRecommendations(formData: FormData, scores: ScoreBreakdown): string[] {
   const recommendations: string[] = [];
-  const weakestAreas = getWeakestAreas(scores);
+  
+  // Identify the weakest areas (below 70)
+  const weakAreas = [
+    { name: 'dealStructure', score: scores.dealStructure },
+    { name: 'financialReadiness', score: scores.financialReadiness },
+    { name: 'experienceLevel', score: scores.experienceLevel },
+    { name: 'propertyAnalysis', score: scores.propertyAnalysis }
+  ].filter(area => area.score < 70).sort((a, b) => a.score - b.score);
 
-  for (const area of weakestAreas.slice(0, 4)) {
-    const recommendation = generateAreaSpecificRecommendation(area, formData, scores);
+  // Generate specific recommendations for each weak area
+  for (const area of weakAreas.slice(0, 4)) {
+    const recommendation = generateAreaSpecificRecommendation(area.name, formData, scores);
     if (recommendation) {
       recommendations.push(recommendation);
     }
@@ -52,18 +60,6 @@ export function generateRecommendations(formData: FormData, scores: ScoreBreakdo
   return recommendations;
 }
 
-function getWeakestAreas(scores: ScoreBreakdown): string[] {
-  const areas = [
-    { name: 'dealStructure', score: scores.dealStructure },
-    { name: 'financialReadiness', score: scores.financialReadiness },
-    { name: 'experienceLevel', score: scores.experienceLevel },
-    { name: 'propertyAnalysis', score: scores.propertyAnalysis }
-  ];
-
-  return areas
-    .sort((a, b) => a.score - b.score)
-    .map(area => area.name);
-}
 
 function generateAreaSpecificRecommendation(area: string, formData: FormData, scores: ScoreBreakdown): string {
   switch (area) {

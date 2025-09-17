@@ -100,11 +100,8 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
           <div className={`text-6xl font-bold mb-2 ${getScoreColor(score)}`}>
             {score}%
           </div>
-          <p className="text-lg font-semibold text-foreground mb-2">
+          <p className="text-lg font-semibold text-foreground mb-6">
             Funding Feasibility Score
-          </p>
-          <p className="text-muted-foreground mb-6">
-            {getScoreMessage(score)}
           </p>
           <Progress value={score} className="mb-4" />
           

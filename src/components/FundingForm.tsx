@@ -71,11 +71,39 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const handleSubmit = async () => {
     setIsAnalyzing(true);
     
+    // Map form data to correct structure for analysis
+    const mappedFormData = {
+      fundingAmount: formData.fundingAmount,
+      fundingPurpose: formData.fundingPurpose,
+      propertyType: formData.propertyType,
+      propertiesExperience: formData.propertiesExperience,
+      creditScore: formData.creditScore,
+      bankBalance: formData.bankBalance,
+      annualIncome: formData.annualIncome,
+      incomeSources: formData.incomeSources,
+      financialAssets: formData.financialAssets,
+      propertyAddress: formData.propertyAddress,
+      propertyInfo: formData.propertyInfo,
+      propertyDetails: formData.propertyDetails,
+      underContract: formData.underContract,
+      ownOtherProperties: formData.ownOtherProperties,
+      currentValue: formData.currentValue,
+      repairsNeeded: formData.repairsNeeded,
+      repairLevel: formData.repairLevel,
+      rehabCosts: formData.rehabCosts,
+      arv: formData.arv,
+      closingDate: formData.closingDate,
+      moneyPlan: formData.moneyPlan,
+      pastDeals: formData.pastDeals,
+      lastDealProfit: formData.lastDealProfit,
+      goodDeal: formData.goodDeal
+    };
+    
     // Perform real lender analysis
     setTimeout(async () => {
       const { analyzeDeal } = await import('../utils/lenderAnalysis');
-      const analysisResult = analyzeDeal(formData);
-      const score = Math.round(analysisResult.overallScore);
+      const analysisResult = analyzeDeal(mappedFormData);
+      const score = analysisResult.overallScore;
       
       // Save to database
       try {
