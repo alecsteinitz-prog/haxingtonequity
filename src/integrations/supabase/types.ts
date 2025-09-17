@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      deal_analyses: {
+        Row: {
+          analysis_score: number | null
+          annual_income: string | null
+          arv_estimate: string | null
+          bank_balance: string | null
+          close_timeline: string | null
+          created_at: string
+          credit_score: string
+          current_value: string | null
+          financial_assets: string[] | null
+          funding_amount: string
+          funding_purpose: string
+          good_deal_criteria: string | null
+          id: string
+          income_sources: string | null
+          last_deal_profit: string | null
+          money_plans: string | null
+          owns_other_properties: boolean | null
+          past_deals: boolean | null
+          properties_count: string
+          property_address: string
+          property_details: string | null
+          property_info: string | null
+          property_specific_info: string | null
+          property_type: string
+          rehab_costs: string | null
+          repair_level: string | null
+          repairs_needed: boolean | null
+          under_contract: boolean | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          analysis_score?: number | null
+          annual_income?: string | null
+          arv_estimate?: string | null
+          bank_balance?: string | null
+          close_timeline?: string | null
+          created_at?: string
+          credit_score: string
+          current_value?: string | null
+          financial_assets?: string[] | null
+          funding_amount: string
+          funding_purpose: string
+          good_deal_criteria?: string | null
+          id?: string
+          income_sources?: string | null
+          last_deal_profit?: string | null
+          money_plans?: string | null
+          owns_other_properties?: boolean | null
+          past_deals?: boolean | null
+          properties_count: string
+          property_address: string
+          property_details?: string | null
+          property_info?: string | null
+          property_specific_info?: string | null
+          property_type: string
+          rehab_costs?: string | null
+          repair_level?: string | null
+          repairs_needed?: boolean | null
+          under_contract?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          analysis_score?: number | null
+          annual_income?: string | null
+          arv_estimate?: string | null
+          bank_balance?: string | null
+          close_timeline?: string | null
+          created_at?: string
+          credit_score?: string
+          current_value?: string | null
+          financial_assets?: string[] | null
+          funding_amount?: string
+          funding_purpose?: string
+          good_deal_criteria?: string | null
+          id?: string
+          income_sources?: string | null
+          last_deal_profit?: string | null
+          money_plans?: string | null
+          owns_other_properties?: boolean | null
+          past_deals?: boolean | null
+          properties_count?: string
+          property_address?: string
+          property_details?: string | null
+          property_info?: string | null
+          property_specific_info?: string | null
+          property_type?: string
+          rehab_costs?: string | null
+          repair_level?: string | null
+          repairs_needed?: boolean | null
+          under_contract?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

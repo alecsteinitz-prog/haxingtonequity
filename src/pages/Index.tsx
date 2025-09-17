@@ -4,8 +4,9 @@ import { FundingAnalysisCard } from "@/components/FundingAnalysisCard";
 import { FundingForm } from "@/components/FundingForm";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { DealHistory } from "@/components/DealHistory";
 
-type AppState = "dashboard" | "form" | "results";
+type AppState = "dashboard" | "form" | "results" | "history";
 
 const Index = () => {
   const [appState, setAppState] = useState<AppState>("dashboard");
@@ -29,6 +30,10 @@ const Index = () => {
 
   const handleResubmit = () => {
     setAppState("form");
+  };
+
+  const handleViewHistory = () => {
+    setAppState("history");
   };
 
   const renderContent = () => {
@@ -63,8 +68,14 @@ const Index = () => {
             onResubmit={handleResubmit}
           />
         );
+      case "history":
+        return (
+          <DealHistory 
+            onBack={handleBackToDashboard}
+          />
+        );
       default:
-        return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} />;
+        return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
     }
   };
 

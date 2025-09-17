@@ -6,9 +6,10 @@ import { Brain, ArrowRight, CheckCircle, AlertCircle, XCircle } from "lucide-rea
 
 interface FundingAnalysisCardProps {
   onStartAnalysis: () => void;
+  onViewHistory: () => void;
 }
 
-export const FundingAnalysisCard = ({ onStartAnalysis }: FundingAnalysisCardProps) => {
+export const FundingAnalysisCard = ({ onStartAnalysis, onViewHistory }: FundingAnalysisCardProps) => {
   return (
     <div className="px-6 py-6 space-y-6">
       {/* Main CTA Card */}
@@ -36,15 +37,24 @@ export const FundingAnalysisCard = ({ onStartAnalysis }: FundingAnalysisCardProp
             </div>
           </div>
           
-          <Button 
-            onClick={onStartAnalysis}
-            variant="premium" 
-            size="lg" 
-            className="w-full"
-          >
-            Start Funding Analysis
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="space-y-3">
+            <Button 
+              onClick={onStartAnalysis}
+              variant="premium" 
+              size="lg" 
+              className="w-full"
+            >
+              Start Funding Analysis
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            <Button 
+              onClick={onViewHistory}
+              variant="outline"
+              className="w-full"
+            >
+              View Analysis History
+            </Button>
+          </div>
           
           <p className="text-xs text-center text-muted-foreground">
             No commitment required • Free analysis

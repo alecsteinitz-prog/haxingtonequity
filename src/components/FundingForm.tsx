@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { ArrowLeft, ArrowRight, Brain, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -70,9 +71,50 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
     setIsAnalyzing(true);
     
     // Simulate AI analysis
-    setTimeout(() => {
-      setIsAnalyzing(false);
+    setTimeout(async () => {
       const mockScore = Math.floor(Math.random() * 40) + 60; // Random score between 60-100
+      
+      // Save to database
+      try {
+        const { error } = await supabase
+          .from('deal_analyses')
+          .insert({
+            funding_amount: formData.fundingAmount,
+            funding_purpose: formData.fundingPurpose,
+            property_type: formData.propertyType,
+            property_details: formData.propertyDetails,
+            properties_count: formData.propertiesExperience,
+            credit_score: formData.creditScore,
+            bank_balance: formData.bankBalance,
+            annual_income: formData.annualIncome,
+            income_sources: formData.incomeSources,
+            financial_assets: formData.financialAssets,
+            property_address: formData.propertyAddress,
+            property_info: formData.propertyInfo,
+            property_specific_info: formData.propertyDetails,
+            under_contract: formData.underContract === 'Yes',
+            owns_other_properties: formData.ownOtherProperties === 'Yes',
+            current_value: formData.currentValue,
+            repairs_needed: formData.repairsNeeded === 'Yes',
+            repair_level: formData.repairLevel,
+            rehab_costs: formData.rehabCosts,
+            arv_estimate: formData.arv,
+            close_timeline: formData.closingDate ? formData.closingDate.toISOString() : null,
+            money_plans: formData.moneyPlan,
+            past_deals: formData.pastDeals === 'Yes',
+            last_deal_profit: formData.lastDealProfit,
+            good_deal_criteria: formData.goodDeal,
+            analysis_score: mockScore
+          });
+
+        if (error) {
+          console.error('Error saving analysis:', error);
+        }
+      } catch (error) {
+        console.error('Error saving analysis:', error);
+      }
+      
+      setIsAnalyzing(false);
       onSubmit({ ...formData, score: mockScore });
     }, 3000);
   };
