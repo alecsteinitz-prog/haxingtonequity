@@ -84,7 +84,7 @@ export const AuthPage = () => {
           <img 
             src={haxingtonLogo} 
             alt="Haxington Equity" 
-            className="h-32 mx-auto mb-4" 
+            className="h-40 mx-auto mb-4" 
           />
         </div>
 
