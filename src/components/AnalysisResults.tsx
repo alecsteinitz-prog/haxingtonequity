@@ -38,25 +38,25 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
     
     if (score >= 80) {
       return [
-        "Your deal structure is solid",
-        "Financial projections look strong", 
-        "Experience level meets requirements",
-        "Property analysis is favorable"
+        "Your deal structure demonstrates strong fundamentals with appropriate loan-to-value ratios, realistic profit margins, and clear exit strategy. This solid foundation makes you an attractive borrower to multiple lenders.",
+        "Your financial projections appear well-researched and conservative, showing realistic timelines and costs. Lenders appreciate borrowers who demonstrate thorough due diligence and realistic expectations about project outcomes.",
+        "Your experience level and track record meet most lender requirements. Continue documenting your successes and building relationships with preferred lenders for even better terms on future deals.",
+        "The property analysis shows strong fundamentals with good location, realistic ARV estimates, and appropriate renovation scope. This type of thorough property evaluation is exactly what lenders want to see."
       ];
     }
     if (score >= 60) {
       return [
-        "Consider increasing your down payment",
-        "Provide additional financial documentation",
-        "Clarify your exit strategy timeline",
-        "Consider partnering with experienced investor"
+        "Increase your down payment to 25-30% of the purchase price to improve your loan-to-value ratio. This demonstrates stronger financial commitment and reduces lender risk, often resulting in better interest rates and terms.",
+        "Strengthen your loan application with additional financial documentation including bank statements, tax returns, and proof of liquid reserves. Lenders want to see 6+ months of PITI payments in reserves for investment properties.",
+        "Develop a more detailed exit strategy with specific timelines, marketing plans, and contingency scenarios. Lenders need confidence in your ability to repay the loan whether through sale, refinance, or rental income.",
+        "Consider partnering with an experienced investor who can provide mentorship, additional capital, or guarantor support. Many lenders are more comfortable with deals that include experienced team members."
       ];
     }
     return [
-      "Increase down payment to 25%+ of purchase price",
-      "Gain more real estate experience or find mentor",
-      "Improve debt-to-income ratio",
-      "Reassess property value and renovation costs"
+      "Significantly increase your down payment to 25-30% of purchase price and ensure you have additional reserves. Most lenders require substantial skin in the game for investment properties, especially for newer investors.",
+      "Gain more hands-on real estate experience through smaller deals, wholesaling, or partnering with experienced investors. Document any construction, property management, or real estate-related experience you have.",
+      "Improve your debt-to-income ratio by paying down existing debts or increasing income. Most lenders prefer DTI below 45% and strong cash flow from other sources to support the investment.",
+      "Reassess your property analysis with professional appraisals, detailed renovation estimates from contractors, and conservative ARV projections. Overly optimistic numbers are a red flag for lenders."
     ];
   };
 

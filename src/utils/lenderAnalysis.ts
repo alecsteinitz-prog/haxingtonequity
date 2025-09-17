@@ -264,19 +264,23 @@ export function analyzeDeal(dealData: DealData): AnalysisResult {
     });
   });
 
-  // Add most common issues as recommendations
+  // Add most common issues as detailed recommendations
   Array.from(commonIssues.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
     .forEach(([issue]) => {
       if (issue.includes('credit score')) {
-        recommendations.push('Consider improving credit score before applying');
+        recommendations.push('Improve your credit score by paying down existing debts, making all payments on time, and avoiding new credit inquiries. Most lenders require a minimum 620-650 FICO score, with better rates available at 700+. Consider waiting 3-6 months while working on credit improvement before reapplying.');
       } else if (issue.includes('LTV')) {
-        recommendations.push('Increase down payment to improve loan-to-value ratio');
+        recommendations.push('Reduce your loan-to-value ratio by increasing your down payment. Most lenders cap LTV at 75-90% depending on the deal type. For fix-and-flip properties, aim for 25-30% down payment. This also demonstrates stronger financial commitment to lenders and may unlock better interest rates.');
+      } else if (issue.includes('ARV')) {
+        recommendations.push('Your after-repair value projections may be too aggressive. Get a professional appraisal or BPO to validate your ARV estimates. Most lenders limit loan-to-ARV at 70-75%. Consider being more conservative with your ARV or finding properties with higher profit margins.');
       } else if (issue.includes('experience')) {
-        recommendations.push('Consider partnering with experienced investor or building track record');
+        recommendations.push('Build your real estate investment experience by starting with smaller deals, partnering with seasoned investors, or consider wholesaling first. Document any real estate experience you have, including personal home renovations. Some lenders may accept strong construction/contractor backgrounds as relevant experience.');
       } else if (issue.includes('amount')) {
-        recommendations.push('Adjust loan amount to match lender criteria');
+        recommendations.push('Adjust your loan amount to fit within lender parameters. If your request is too low, consider bundling multiple properties or finding larger deals. If too high, break the project into phases or find additional equity partners to reduce the loan amount needed.');
+      } else if (issue.includes('purpose')) {
+        recommendations.push('Ensure your funding purpose aligns with the lender\'s specialty. Fix-and-flip lenders focus on quick turnarounds (6-18 months), while DSCR lenders prefer buy-and-hold rental properties. Match your strategy to the right lender type for better approval odds.');
       }
     });
 
