@@ -236,7 +236,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       <div className="px-6 py-8">
         <Card className="bg-gradient-subtle border-0 shadow-premium">
           <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center w-72 h-72 mx-auto mb-0">
+            <div className="flex items-center justify-center w-72 h-72 mx-auto -mb-20">
               <img src={heLogo} alt="Haxington Equity" className="w-60 h-48 object-contain animate-pulse" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">Analyzing Your Eligibility</h2>

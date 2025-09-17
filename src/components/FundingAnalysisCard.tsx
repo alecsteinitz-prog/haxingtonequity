@@ -16,7 +16,7 @@ export const FundingAnalysisCard = ({ onStartAnalysis, onViewHistory }: FundingA
       {/* Main CTA Card */}
       <Card className="bg-gradient-subtle border-0 shadow-card">
         <CardHeader className="text-center pb-4">
-          <div className="flex items-center justify-center w-60 h-60 mx-auto mb-0">
+          <div className="flex items-center justify-center w-60 h-60 mx-auto -mb-16">
             <img src={heLogo} alt="Haxington Equity" className="w-48 h-36 object-contain" />
           </div>
           <CardTitle className="text-xl font-bold text-foreground">
