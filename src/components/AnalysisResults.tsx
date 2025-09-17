@@ -14,80 +14,99 @@ interface AnalysisResultsProps {
 export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: AnalysisResultsProps) => {
   
   const calculateDealStructureScore = (result: any) => {
-    if (!result?.qualifyingLenders) return Math.min(score + 10, 100);
+    let score = 100;
     
-    // Base score on loan amount fit and purpose alignment
-    let structureScore = 0;
-    const totalLenders = 5; // Total lenders in our database
-    const qualifyingCount = result.qualifyingLenders.length;
+    // Check loan amount alignment with form data
+    const formData = result.formData || {};
+    const loanAmount = parseFloat(formData.fundingAmount?.replace(/[^0-9.]/g, '') || '0');
     
-    // Score based on how many lenders accept the deal structure
-    structureScore = (qualifyingCount / totalLenders) * 100;
+    // Penalize if loan amount is outside common ranges
+    if (loanAmount < 75000) score -= 20;
+    if (loanAmount > 5000000) score -= 25;
     
-    // Bonus for good LTV ratios across lenders
-    const avgLenderScore = result.qualifyingLenders.reduce((sum: number, match: any) => sum + match.score, 0) / Math.max(result.qualifyingLenders.length, 1);
+    // Check purpose alignment
+    const purposeScore = result.qualifyingLenders?.length > 0 ? 
+      (result.qualifyingLenders.length / 5) * 40 : 0;
     
-    return Math.min(100, Math.round((structureScore + avgLenderScore) / 2));
+    return Math.min(100, Math.max(0, Math.round(score * 0.6 + purposeScore)));
   };
 
   const calculateFinancialScore = (result: any) => {
-    if (!result?.qualifyingLenders) return Math.max(score - 15, 0);
+    let score = 100;
+    const formData = result.formData || {};
     
-    // Analyze credit score and income strength
-    let financialScore = 60; // Base score
+    // Credit score assessment based on actual form answer
+    const creditRange = formData.creditScore || '';
+    if (creditRange === 'below-640') score -= 40;
+    else if (creditRange === 'above-640') score -= 20;
+    else if (creditRange === 'above-680') score -= 10;
+    else if (creditRange === 'above-720') score += 10;
     
-    // Credit score analysis
-    const creditIssues = result.qualifyingLenders.some((match: any) => 
-      match.issues.some((issue: string) => issue.includes('credit score'))
-    );
-    if (!creditIssues) financialScore += 20;
+    // Income assessment
+    const income = parseFloat(formData.annualIncome?.replace(/[^0-9.]/g, '') || '0');
+    if (income < 50000) score -= 20;
+    else if (income > 100000) score += 10;
     
-    // Income/asset strength
-    const hasStrongIncome = result.dealStrengths?.some((strength: string) => 
-      strength.includes('income') || strength.includes('Strong')
-    );
-    if (hasStrongIncome) financialScore += 20;
+    // Bank balance assessment
+    const bankBalance = parseFloat(formData.bankBalance?.replace(/[^0-9.]/g, '') || '0');
+    if (bankBalance < 10000) score -= 15;
+    else if (bankBalance > 50000) score += 10;
     
-    return Math.min(100, financialScore);
+    return Math.min(100, Math.max(0, score));
   };
 
   const calculateExperienceScore = (result: any) => {
-    if (!result?.qualifyingLenders) return Math.min(score + 5, 100);
+    let score = 50; // Base score for new investors
+    const formData = result.formData || {};
     
-    // Base score on experience requirements
-    let experienceScore = 50;
+    // Past deals experience
+    if (formData.pastDeals === 'Yes') score += 30;
     
-    const experienceIssues = result.qualifyingLenders.some((match: any) => 
-      match.issues.some((issue: string) => issue.includes('experience'))
-    );
+    // Property ownership experience  
+    if (formData.ownOtherProperties === 'Yes') score += 20;
     
-    if (!experienceIssues) {
-      experienceScore += 40; // Strong experience
-    } else {
-      // Some experience but not enough for all lenders
-      experienceScore += 20;
-    }
+    // Properties experience range
+    const propertiesExp = formData.propertiesExperience || '';
+    if (propertiesExp === '1-3') score += 10;
+    else if (propertiesExp === '4-10') score += 20;
+    else if (propertiesExp === '11-20') score += 30;
+    else if (propertiesExp === '21+') score += 40;
     
-    return Math.min(100, experienceScore);
+    return Math.min(100, Math.max(0, score));
   };
 
   const calculatePropertyScore = (result: any) => {
-    if (!result?.qualifyingLenders) return score;
+    let score = 80; // Base property score
+    const formData = result.formData || {};
     
-    // Analyze property-related issues
-    let propertyScore = 70; // Base score
+    // LTV calculation
+    const loanAmount = parseFloat(formData.fundingAmount?.replace(/[^0-9.]/g, '') || '0');
+    const currentValue = parseFloat(formData.currentValue?.replace(/[^0-9.]/g, '') || '0');
     
-    const ltvIssues = result.qualifyingLenders.some((match: any) => 
-      match.issues.some((issue: string) => issue.includes('LTV'))
-    );
-    const arvIssues = result.qualifyingLenders.some((match: any) => 
-      match.issues.some((issue: string) => issue.includes('ARV'))
-    );
+    if (currentValue > 0) {
+      const ltv = (loanAmount / currentValue) * 100;
+      if (ltv > 90) score -= 30;
+      else if (ltv > 80) score -= 15;
+      else if (ltv < 70) score += 10;
+    }
     
-    if (!ltvIssues) propertyScore += 15;
-    if (!arvIssues) propertyScore += 15;
+    // ARV analysis for flip properties
+    if (formData.fundingPurpose?.toLowerCase().includes('flip')) {
+      const arv = parseFloat(formData.arv?.replace(/[^0-9.]/g, '') || '0');
+      if (arv > 0) {
+        const loanToArv = (loanAmount / arv) * 100;
+        if (loanToArv > 75) score -= 20;
+        else if (loanToArv < 70) score += 10;
+      }
+    }
     
-    return Math.min(100, propertyScore);
+    // Property condition assessment
+    if (formData.repairsNeeded === 'Yes') {
+      const rehabCosts = parseFloat(formData.rehabCosts?.replace(/[^0-9.]/g, '') || '0');
+      if (rehabCosts > currentValue * 0.3) score -= 15; // Major rehab
+    }
+    
+    return Math.min(100, Math.max(0, score));
   };
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
