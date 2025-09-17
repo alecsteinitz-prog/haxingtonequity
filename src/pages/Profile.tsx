@@ -289,9 +289,8 @@ export const ProfilePage = () => {
       </div>
 
       <Tabs defaultValue="experience" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="experience">Experience</TabsTrigger>
-          <TabsTrigger value="deals">Deal History</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -364,30 +363,6 @@ export const ProfilePage = () => {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="deals" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Deal History</h3>
-          </div>
-          
-          {deals.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No deals yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Complete the funding analysis form to see your deals appear here automatically
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {deals.map((deal) => (
-                <DealHistoryCard key={deal.id} deal={deal} />
-              ))}
-            </div>
-          )}
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
