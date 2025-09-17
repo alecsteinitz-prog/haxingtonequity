@@ -193,14 +193,46 @@ export const ProfilePage = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
-        <Button 
-          variant={editMode ? "outline" : "default"}
-          onClick={() => setEditMode(!editMode)}
-        >
-          {editMode ? "Cancel" : "Edit Profile"}
-        </Button>
+      {/* Profile Header */}
+      <div className="text-center space-y-4">
+        <div className="relative inline-block">
+          <Avatar className="h-32 w-32 mx-auto">
+            <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+            <AvatarFallback className="text-2xl">
+              {getInitials(profile.first_name, profile.last_name)}
+            </AvatarFallback>
+          </Avatar>
+          {editMode && (
+            <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer">
+              <Camera className="h-8 w-8 text-white" />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={uploadAvatar}
+                disabled={uploading}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+            </div>
+          )}
+        </div>
+        
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">
+            {profile.first_name} {profile.last_name}
+          </h1>
+          <h5 className="text-lg text-muted-foreground mt-2">
+            @{profile.display_name.toLowerCase().replace(/\s+/g, '')}
+          </h5>
+        </div>
+        
+        <div className="flex justify-center">
+          <Button 
+            variant={editMode ? "outline" : "default"}
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? "Cancel" : "Edit Profile"}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
@@ -211,49 +243,25 @@ export const ProfilePage = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          {/* Profile Header */}
+          {/* Profile Details */}
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-start space-x-6">
-                <div className="relative">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
-                    <AvatarFallback className="text-xl">
-                      {getInitials(profile.first_name, profile.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {editMode && (
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer">
-                      <Camera className="h-6 w-6 text-white" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={uploadAvatar}
-                        disabled={uploading}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                    </div>
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  {profile.actively_seeking_funding ? (
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                      Actively Seeking Funding
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">Not Seeking Funding</Badge>
                   )}
                 </div>
                 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-bold">{profile.display_name}</h2>
-                    <div className="flex items-center space-x-2">
-                      {profile.actively_seeking_funding ? (
-                        <Badge variant="default" className="bg-green-100 text-green-800">
-                          Actively Seeking Funding
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">Not Seeking Funding</Badge>
-                      )}
-                    </div>
-                  </div>
-                  
+                <div className="text-center">
                   <p className="text-muted-foreground mb-2">{profile.email}</p>
                   
                   {profile.funding_eligibility_score && (
-                    <div className="flex items-center space-x-2 mb-4">
+                    <div className="flex items-center justify-center space-x-2 mb-4">
                       <TrendingUp className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">
                         Eligibility Score: {profile.funding_eligibility_score}%
