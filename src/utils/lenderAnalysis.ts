@@ -271,27 +271,62 @@ export function analyzeDeal(dealData: DealData): AnalysisResult {
     .forEach(([issue]) => {
       if (issue.includes('credit score')) {
         const currentScore = getCreditScore(dealData.creditScore);
-        recommendations.push(`Your current credit score range (${dealData.creditScore}) translates to approximately ${currentScore} FICO. Most lenders require 620-650 minimum, with better rates at 700+. Focus on paying down existing debts, making all payments on time, and avoiding new credit inquiries. Wait 3-6 months while working on credit improvement before reapplying.`);
+        const failedLenders = lenderMatches.filter(match => 
+          match.issues.some(i => i.includes('credit score'))
+        ).map(m => m.lender.name);
+        const minRequiredScore = Math.min(...LENDERS.map(l => l.minFico));
+        recommendations.push(`Your credit score range (${dealData.creditScore}, ~${currentScore} FICO) doesn't meet requirements for ${failedLenders.join(', ')}. These lenders require minimum ${minRequiredScore}-650+ FICO. Improve by: paying down credit cards below 30% utilization, making all payments on time, and avoiding new credit inquiries. Wait 3-6 months for score improvement before reapplying.`);
       } else if (issue.includes('LTV')) {
         const loanAmount = parseNumericValue(dealData.fundingAmount);
         const currentValue = parseNumericValue(dealData.currentValue);
         const currentLTV = currentValue > 0 ? ((loanAmount / currentValue) * 100).toFixed(1) : 'N/A';
-        recommendations.push(`Your current loan-to-value ratio is ${currentLTV}% (loan: $${loanAmount.toLocaleString()}, property value: $${currentValue.toLocaleString()}). Most lenders cap LTV at 75-90%. Consider increasing your down payment to reduce the loan amount to approximately $${(currentValue * 0.75).toLocaleString()} or finding a higher-value property.`);
+        const affectedLenders = lenderMatches.filter(match => 
+          match.issues.some(i => i.includes('LTV'))
+        );
+        const bestLTVRequirement = Math.min(...affectedLenders.map(m => m.lender.maxLtv));
+        const targetLoanAmount = (currentValue * (bestLTVRequirement / 100)).toLocaleString();
+        recommendations.push(`Your LTV is ${currentLTV}% (${dealData.fundingAmount} loan on $${currentValue.toLocaleString()} property). Lenders like ${affectedLenders.map(m => m.lender.name).join(', ')} cap LTV at ${bestLTVRequirement}%. Reduce your loan to $${targetLoanAmount} or increase down payment by $${(loanAmount - (currentValue * bestLTVRequirement / 100)).toLocaleString()} to qualify.`);
       } else if (issue.includes('ARV')) {
         const loanAmount = parseNumericValue(dealData.fundingAmount);
         const arvValue = parseNumericValue(dealData.arv);
         const currentLoanToARV = arvValue > 0 ? ((loanAmount / arvValue) * 100).toFixed(1) : 'N/A';
-        const targetLoanAmount = (arvValue * 0.75).toLocaleString();
-        recommendations.push(`Your loan-to-ARV ratio is ${currentLoanToARV}% (loan: $${loanAmount.toLocaleString()}, ARV: $${arvValue.toLocaleString()}). Most lenders limit this to 70-75%. Either reduce your loan request to approximately $${targetLoanAmount} or get a professional appraisal to validate a higher ARV estimate.`);
+        const affectedLenders = lenderMatches.filter(match => 
+          match.issues.some(i => i.includes('ARV'))
+        );
+        const bestARVRequirement = Math.min(...affectedLenders.map(m => m.lender.maxArv));
+        const targetLoanAmount = (arvValue * (bestARVRequirement / 100)).toLocaleString();
+        recommendations.push(`Your loan-to-ARV ratio is ${currentLoanToARV}% (${dealData.fundingAmount} loan, $${arvValue.toLocaleString()} ARV). Lenders like ${affectedLenders.map(m => m.lender.name).join(', ')} limit this to ${bestARVRequirement}%. Either reduce loan to $${targetLoanAmount} or get professional appraisal to justify higher ARV estimate.`);
       } else if (issue.includes('experience')) {
-        const pastDeals = dealData.pastDeals === 'Yes' ? 'have' : 'have not';
-        const ownProperties = dealData.ownOtherProperties === 'Yes' ? 'do own' : 'do not own';
-        recommendations.push(`You ${pastDeals} completed past deals and ${ownProperties} other properties. Most investor-focused lenders require demonstrated experience. Consider: 1) Partnering with seasoned investors who have 5+ deals, 2) Starting with owner-occupied financing if applicable, 3) Building track record with smaller deals first, or 4) Highlighting any construction/renovation experience you have.`);
+        const pastDeals = dealData.pastDeals === 'Yes';
+        const ownProperties = dealData.ownOtherProperties === 'Yes';
+        const affectedLenders = lenderMatches.filter(match => 
+          match.issues.some(i => i.includes('experience'))
+        );
+        const investorOnlyLenders = affectedLenders.filter(m => !m.lender.acceptsOO);
+        recommendations.push(`You ${pastDeals ? 'have' : 'have not'} completed past deals and ${ownProperties ? 'do' : 'do not'} own other properties. Lenders like ${investorOnlyLenders.map(m => m.lender.name).join(', ')} require investment experience. Solutions: 1) Partner with experienced investor (5+ deals), 2) Start with smaller deal to build track record, 3) Document any construction/renovation experience, 4) Consider owner-occupied financing first.`);
       } else if (issue.includes('amount')) {
         const requestedAmount = parseNumericValue(dealData.fundingAmount);
-        recommendations.push(`Your requested funding amount of $${requestedAmount.toLocaleString()} falls outside many lender parameters. Review the qualifying lenders above to see their loan ranges. Consider adjusting your loan request, finding properties that fit within common ranges ($75K-$2M), or exploring portfolio lenders for larger amounts.`);
+        const tooLowLenders = lenderMatches.filter(match => 
+          requestedAmount < match.lender.minLoanAmount
+        );
+        const tooHighLenders = lenderMatches.filter(match => 
+          requestedAmount > match.lender.maxLoanAmount
+        );
+        if (tooLowLenders.length > 0) {
+          const minAmount = Math.min(...tooLowLenders.map(m => m.lender.minLoanAmount));
+          recommendations.push(`Your $${requestedAmount.toLocaleString()} request is below minimum for ${tooLowLenders.map(m => m.lender.name).join(', ')} (minimum: $${minAmount.toLocaleString()}). Consider bundling multiple properties or finding larger deals to meet lender minimums.`);
+        } else if (tooHighLenders.length > 0) {
+          const maxAmount = Math.max(...tooHighLenders.map(m => m.lender.maxLoanAmount));
+          recommendations.push(`Your $${requestedAmount.toLocaleString()} request exceeds limits for ${tooHighLenders.map(m => m.lender.name).join(', ')} (maximum: $${(maxAmount/1000000).toFixed(1)}M). Consider portfolio lenders, breaking into phases, or finding equity partners.`);
+        }
       } else if (issue.includes('purpose')) {
-        recommendations.push(`Your funding purpose "${dealData.fundingPurpose}" may not align with some lender specialties. Fix-and-flip lenders focus on quick turnarounds (6-18 months), while DSCR lenders prefer buy-and-hold rental properties. Ensure your exit strategy matches the lender type you're targeting.`);
+        const affectedLenders = lenderMatches.filter(match => 
+          match.issues.some(i => i.includes('purpose'))
+        );
+        const purposeMatches = LENDERS.filter(l => 
+          l.focus.some(focus => dealData.fundingPurpose.toLowerCase().includes(focus.toLowerCase().replace('&', '').replace(' ', '')))
+        );
+        recommendations.push(`Your "${dealData.fundingPurpose}" purpose doesn't align with ${affectedLenders.map(m => m.lender.name).join(', ')}. Better matches include ${purposeMatches.map(l => l.name).join(', ')} who specialize in ${purposeMatches.map(l => l.focus.join(', ')).join('; ')}. Ensure your exit strategy timeline matches lender expectations.`);
       }
     });
 

@@ -196,13 +196,13 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
         </CardHeader>
         <CardContent className="space-y-3">
           {getRecommendations(score).map((recommendation, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                score >= 80 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+            <div key={index} className="flex items-start gap-4">
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0 ${
+                score >= 80 ? "bg-success/20 text-success border-2 border-success/30" : "bg-warning/20 text-warning border-2 border-warning/30"
               }`}>
                 {index + 1}
               </div>
-              <p className="text-sm text-foreground">{recommendation}</p>
+              <p className="text-sm text-foreground leading-relaxed pt-1">{recommendation}</p>
             </div>
           ))}
         </CardContent>
