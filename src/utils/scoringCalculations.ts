@@ -34,6 +34,23 @@ interface ScoreBreakdown {
 }
 
 function parseNumericValue(value: string): number {
+  // Handle funding amount ranges
+  if (value.includes('k-') || value.includes('m') || value.includes('M')) {
+    // Convert range to middle value for scoring
+    if (value === '100k-200k') return 150000;
+    if (value === '201k-500k') return 350000;
+    if (value === '501k-1m') return 750000;
+    if (value === '1m-5m') return 3000000;
+    if (value === '5m+') return 7500000;
+  }
+  
+  // Handle credit score ranges
+  if (value === 'below-640') return 600;
+  if (value === 'above-640') return 650;
+  if (value === 'above-680') return 700;
+  if (value === 'above-720') return 750;
+  
+  // Handle regular numeric values
   const cleanValue = value.replace(/[^0-9.]/g, '');
   return parseFloat(cleanValue) || 0;
 }
