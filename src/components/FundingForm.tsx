@@ -13,6 +13,7 @@ import { ArrowLeft, ArrowRight, Brain, CalendarIcon, ClipboardPaste } from "luci
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -22,6 +23,7 @@ interface FundingFormProps {
 export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { syncEligibilityScore } = useProfileSync();
   const [formData, setFormData] = useState({
     fundingAmount: "",
     fundingPurpose: "",
@@ -144,6 +146,9 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       } catch (error) {
         console.error('Error saving analysis:', error);
       }
+      
+      // Sync eligibility score with profile
+      await syncEligibilityScore(score, analysisResult);
       
       setIsAnalyzing(false);
       onSubmit({ ...formData, score, analysisResult });

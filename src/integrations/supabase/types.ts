@@ -113,8 +113,59 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_history: {
+        Row: {
+          city: string
+          close_date: string | null
+          created_at: string
+          deal_status: string
+          deal_value: number | null
+          id: string
+          profit_amount: number | null
+          property_type: string
+          state: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          close_date?: string | null
+          created_at?: string
+          deal_status: string
+          deal_value?: number | null
+          id?: string
+          profit_amount?: number | null
+          property_type: string
+          state?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          close_date?: string | null
+          created_at?: string
+          deal_status?: string
+          deal_value?: number | null
+          id?: string
+          profit_amount?: number | null
+          property_type?: string
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          actively_seeking_funding: boolean | null
           avatar_url: string | null
           bio: string | null
           company: string | null
@@ -123,9 +174,12 @@ export type Database = {
           display_name: string | null
           email: string
           entity_type: Database["public"]["Enums"]["entity_type"] | null
+          experience_level: string | null
           experience_summary: string | null
           first_name: string
+          funding_eligibility_score: number | null
           id: string
+          last_eligibility_update: string | null
           last_name: string
           linkedin_profile: string | null
           location: string | null
@@ -134,12 +188,15 @@ export type Database = {
           preferred_asset_classes:
             | Database["public"]["Enums"]["asset_class"][]
             | null
+          profile_bio: string | null
+          property_focus: string[] | null
           role_title: string | null
           updated_at: string
           user_id: string
           years_active: number | null
         }
         Insert: {
+          actively_seeking_funding?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           company?: string | null
@@ -148,9 +205,12 @@ export type Database = {
           display_name?: string | null
           email: string
           entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          experience_level?: string | null
           experience_summary?: string | null
           first_name: string
+          funding_eligibility_score?: number | null
           id?: string
+          last_eligibility_update?: string | null
           last_name: string
           linkedin_profile?: string | null
           location?: string | null
@@ -159,12 +219,15 @@ export type Database = {
           preferred_asset_classes?:
             | Database["public"]["Enums"]["asset_class"][]
             | null
+          profile_bio?: string | null
+          property_focus?: string[] | null
           role_title?: string | null
           updated_at?: string
           user_id: string
           years_active?: number | null
         }
         Update: {
+          actively_seeking_funding?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           company?: string | null
@@ -173,9 +236,12 @@ export type Database = {
           display_name?: string | null
           email?: string
           entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          experience_level?: string | null
           experience_summary?: string | null
           first_name?: string
+          funding_eligibility_score?: number | null
           id?: string
+          last_eligibility_update?: string | null
           last_name?: string
           linkedin_profile?: string | null
           location?: string | null
@@ -184,6 +250,8 @@ export type Database = {
           preferred_asset_classes?:
             | Database["public"]["Enums"]["asset_class"][]
             | null
+          profile_bio?: string | null
+          property_focus?: string[] | null
           role_title?: string | null
           updated_at?: string
           user_id?: string
