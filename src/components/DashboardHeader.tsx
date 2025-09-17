@@ -47,9 +47,8 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
                   <DollarSign className="w-4 h-4 text-secondary" />
                 </div>
                 <div>
-                  <p className="text-xs text-primary-foreground/80">Amount Transacted</p>
+                  <p className="text-xs text-primary-foreground/80">Amount Funded</p>
                   <p className="text-lg font-bold text-primary-foreground">$50M+</p>
-                  <p className="text-xs text-primary-foreground/60">past 12 months</p>
                 </div>
               </div>
             </Card>
