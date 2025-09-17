@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, DollarSign, MapPin, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, MapPin, TrendingUp, Eye } from "lucide-react";
 import { format } from "date-fns";
 
 interface DealAnalysis {
@@ -153,6 +153,20 @@ export const DealHistory = ({ onBack }: DealHistoryProps) => {
                       {analysis.close_timeline ? format(new Date(analysis.close_timeline), 'MMM d, yyyy') : 'N/A'}
                     </p>
                   </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      // TODO: Implement view previous answers functionality
+                      console.log('View answers for analysis:', analysis.id);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Previous Answers
+                  </Button>
                 </div>
               </CardContent>
             </Card>
