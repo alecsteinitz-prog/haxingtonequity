@@ -31,34 +31,6 @@ export const Resources = () => {
         </p>
       </div>
 
-      {/* YouTube Section */}
-      <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Youtube className="w-6 h-6 text-red-500" />
-            <CardTitle>Haxington Equity YouTube Channel</CardTitle>
-          </div>
-          <CardDescription>
-            Watch our latest videos on real estate investment strategies, market analysis, and expert insights
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log("YouTube button clicked");
-              const url = "https://www.youtube.com/@Haxington.Equity";
-              window.location.href = url;
-            }}
-            className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors"
-          >
-            <Youtube className="w-4 h-4" />
-            Visit Our YouTube Channel
-            <ExternalLink className="w-4 h-4" />
-          </button>
-        </CardContent>
-      </Card>
 
       {/* Blog Section */}
       <div className="space-y-4">
