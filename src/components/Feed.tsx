@@ -5,7 +5,7 @@ import { PostCard } from "./PostCard";
 import { CreatePost } from "./CreatePost";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { TrendingUp, Clock } from "lucide-react";
+import { TrendingUp, Clock, Edit3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Post {
@@ -28,6 +28,7 @@ interface Post {
 export const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [showCreatePost, setShowCreatePost] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -110,6 +111,7 @@ export const Feed = () => {
 
   const handlePostCreated = () => {
     fetchPosts();
+    setShowCreatePost(false);
   };
 
   const handleLikeToggle = async (postId: string, isLiked: boolean) => {
@@ -243,12 +245,27 @@ export const Feed = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header with Create Post Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Community Feed</h2>
+        {user && (
+          <Button
+            onClick={() => setShowCreatePost(!showCreatePost)}
+            className="flex items-center gap-2"
+            variant={showCreatePost ? "outline" : "default"}
+          >
+            <Edit3 className="h-4 w-4" />
+            {showCreatePost ? "Cancel" : "Share your strategy"}
+          </Button>
+        )}
+      </div>
+
       {/* Create Post Section */}
-      {user && <CreatePost onPostCreated={handlePostCreated} />}
+      {user && showCreatePost && <CreatePost onPostCreated={handlePostCreated} />}
 
       {/* Sort Controls */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Community Feed</h2>
+        <span className="text-sm text-muted-foreground">Sort by:</span>
         <Select value={sortBy} onValueChange={(value: "latest" | "popular") => setSortBy(value)}>
           <SelectTrigger className="w-40">
             <SelectValue />
