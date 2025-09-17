@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import { AuthPage } from "./pages/Auth";
 import { ProfilePage } from "./pages/Profile";
@@ -18,7 +19,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <>
+    <AuthProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -44,7 +45,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 };
 

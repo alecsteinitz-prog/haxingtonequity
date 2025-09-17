@@ -20,7 +20,7 @@ interface Post {
     last_name: string;
     avatar_url?: string;
     experience_level?: string;
-  };
+  } | null;
   user_liked?: boolean;
   user_saved?: boolean;
 }
@@ -81,12 +81,15 @@ export const Feed = () => {
         userSavedStrategies = savedData?.map(saved => saved.post_id) || [];
       }
 
-      // Combine the data
-      const enrichedPosts = postsData?.map(post => ({
-        ...post,
-        user_liked: userLikes.includes(post.id),
-        user_saved: userSavedStrategies.includes(post.id)
-      })) || [];
+      // Combine the data and filter out posts without profiles
+      const enrichedPosts = postsData
+        ?.filter(post => post.profiles !== null)
+        ?.map(post => ({
+          ...post,
+          profiles: post.profiles!,
+          user_liked: userLikes.includes(post.id),
+          user_saved: userSavedStrategies.includes(post.id)
+        })) || [];
 
       setPosts(enrichedPosts);
     } catch (error) {
