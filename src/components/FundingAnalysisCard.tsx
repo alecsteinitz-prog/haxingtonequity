@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Brain, ArrowRight, CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import heLogo from "@/assets/he-logo.png";
 
 interface FundingAnalysisCardProps {
   onStartAnalysis: () => void;
@@ -16,7 +17,7 @@ export const FundingAnalysisCard = ({ onStartAnalysis, onViewHistory }: FundingA
       <Card className="bg-gradient-subtle border-0 shadow-card">
         <CardHeader className="text-center pb-4">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-gold">
-            <Brain className="w-8 h-8 text-accent-foreground" />
+            <img src={heLogo} alt="Haxington Equity" className="w-10 h-10 object-contain" />
           </div>
           <CardTitle className="text-xl font-bold text-foreground">
             AI-Powered Deal Analysis
