@@ -79,12 +79,12 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
                 placeholder="Share your real estate strategy, lesson learned, or funding win..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                maxLength={280}
+                maxLength={140}
                 className="min-h-[100px] resize-none"
               />
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  {content.length}/280 characters
+                  {content.length}/140 characters
                 </span>
                 <Button 
                   type="submit" 
