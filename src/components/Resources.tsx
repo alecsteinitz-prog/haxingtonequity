@@ -43,18 +43,20 @@ export const Resources = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <a 
-            href="https://www.youtube.com/@Haxington.Equity" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-block w-full"
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("YouTube button clicked");
+              const url = "https://www.youtube.com/@Haxington.Equity";
+              window.location.href = url;
+            }}
+            className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors"
           >
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
-              <Youtube className="w-4 h-4 mr-2" />
-              Visit Our YouTube Channel
-              <ExternalLink className="w-4 h-4 ml-2" />
-            </Button>
-          </a>
+            <Youtube className="w-4 h-4" />
+            Visit Our YouTube Channel
+            <ExternalLink className="w-4 h-4" />
+          </button>
         </CardContent>
       </Card>
 
