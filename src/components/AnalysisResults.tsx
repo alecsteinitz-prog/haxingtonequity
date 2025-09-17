@@ -12,6 +12,83 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: AnalysisResultsProps) => {
+  
+  const calculateDealStructureScore = (result: any) => {
+    if (!result?.qualifyingLenders) return Math.min(score + 10, 100);
+    
+    // Base score on loan amount fit and purpose alignment
+    let structureScore = 0;
+    const totalLenders = 5; // Total lenders in our database
+    const qualifyingCount = result.qualifyingLenders.length;
+    
+    // Score based on how many lenders accept the deal structure
+    structureScore = (qualifyingCount / totalLenders) * 100;
+    
+    // Bonus for good LTV ratios across lenders
+    const avgLenderScore = result.qualifyingLenders.reduce((sum: number, match: any) => sum + match.score, 0) / Math.max(result.qualifyingLenders.length, 1);
+    
+    return Math.min(100, Math.round((structureScore + avgLenderScore) / 2));
+  };
+
+  const calculateFinancialScore = (result: any) => {
+    if (!result?.qualifyingLenders) return Math.max(score - 15, 0);
+    
+    // Analyze credit score and income strength
+    let financialScore = 60; // Base score
+    
+    // Credit score analysis
+    const creditIssues = result.qualifyingLenders.some((match: any) => 
+      match.issues.some((issue: string) => issue.includes('credit score'))
+    );
+    if (!creditIssues) financialScore += 20;
+    
+    // Income/asset strength
+    const hasStrongIncome = result.dealStrengths?.some((strength: string) => 
+      strength.includes('income') || strength.includes('Strong')
+    );
+    if (hasStrongIncome) financialScore += 20;
+    
+    return Math.min(100, financialScore);
+  };
+
+  const calculateExperienceScore = (result: any) => {
+    if (!result?.qualifyingLenders) return Math.min(score + 5, 100);
+    
+    // Base score on experience requirements
+    let experienceScore = 50;
+    
+    const experienceIssues = result.qualifyingLenders.some((match: any) => 
+      match.issues.some((issue: string) => issue.includes('experience'))
+    );
+    
+    if (!experienceIssues) {
+      experienceScore += 40; // Strong experience
+    } else {
+      // Some experience but not enough for all lenders
+      experienceScore += 20;
+    }
+    
+    return Math.min(100, experienceScore);
+  };
+
+  const calculatePropertyScore = (result: any) => {
+    if (!result?.qualifyingLenders) return score;
+    
+    // Analyze property-related issues
+    let propertyScore = 70; // Base score
+    
+    const ltvIssues = result.qualifyingLenders.some((match: any) => 
+      match.issues.some((issue: string) => issue.includes('LTV'))
+    );
+    const arvIssues = result.qualifyingLenders.some((match: any) => 
+      match.issues.some((issue: string) => issue.includes('ARV'))
+    );
+    
+    if (!ltvIssues) propertyScore += 15;
+    if (!arvIssues) propertyScore += 15;
+    
+    return Math.min(100, propertyScore);
+  };
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
@@ -111,45 +188,91 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
           <CardTitle className="text-lg">Score Breakdown</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Deal Structure</span>
-            <div className="flex items-center gap-2">
-              <Progress value={Math.min(score + 10, 100)} className="w-20 h-2" />
-              <Badge variant={score >= 70 ? "default" : "secondary"} className="text-xs">
-                {Math.min(score + 10, 100)}%
-              </Badge>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Financial Readiness</span>
-            <div className="flex items-center gap-2">
-              <Progress value={Math.max(score - 15, 0)} className="w-20 h-2" />
-              <Badge variant={score >= 85 ? "default" : "secondary"} className="text-xs">
-                {Math.max(score - 15, 0)}%
-              </Badge>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Experience Level</span>
-            <div className="flex items-center gap-2">
-              <Progress value={Math.min(score + 5, 100)} className="w-20 h-2" />
-              <Badge variant={score >= 75 ? "default" : "secondary"} className="text-xs">
-                {Math.min(score + 5, 100)}%
-              </Badge>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Property Analysis</span>
-            <div className="flex items-center gap-2">
-              <Progress value={score} className="w-20 h-2" />
-              <Badge variant={score >= 80 ? "default" : "secondary"} className="text-xs">
-                {score}%
-              </Badge>
-            </div>
-          </div>
+          {analysisResult ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Deal Structure</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={calculateDealStructureScore(analysisResult)} className="w-20 h-2" />
+                  <Badge variant={calculateDealStructureScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
+                    {calculateDealStructureScore(analysisResult)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Financial Readiness</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={calculateFinancialScore(analysisResult)} className="w-20 h-2" />
+                  <Badge variant={calculateFinancialScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
+                    {calculateFinancialScore(analysisResult)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Experience Level</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={calculateExperienceScore(analysisResult)} className="w-20 h-2" />
+                  <Badge variant={calculateExperienceScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
+                    {calculateExperienceScore(analysisResult)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Property Analysis</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={calculatePropertyScore(analysisResult)} className="w-20 h-2" />
+                  <Badge variant={calculatePropertyScore(analysisResult) >= 70 ? "default" : "secondary"} className="text-xs">
+                    {calculatePropertyScore(analysisResult)}%
+                  </Badge>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Deal Structure</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={Math.min(score + 10, 100)} className="w-20 h-2" />
+                  <Badge variant={score >= 70 ? "default" : "secondary"} className="text-xs">
+                    {Math.min(score + 10, 100)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Financial Readiness</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={Math.max(score - 15, 0)} className="w-20 h-2" />
+                  <Badge variant={score >= 85 ? "default" : "secondary"} className="text-xs">
+                    {Math.max(score - 15, 0)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Experience Level</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={Math.min(score + 5, 100)} className="w-20 h-2" />
+                  <Badge variant={score >= 75 ? "default" : "secondary"} className="text-xs">
+                    {Math.min(score + 5, 100)}%
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Property Analysis</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={score} className="w-20 h-2" />
+                  <Badge variant={score >= 80 ? "default" : "secondary"} className="text-xs">
+                    {score}%
+                  </Badge>
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
