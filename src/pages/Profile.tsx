@@ -70,7 +70,23 @@ export const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    // For development mode without auth, create a mock profile
+    if (!user) {
+      setProfile({
+        user_id: 'mock-user',
+        email: 'developer@example.com',
+        first_name: 'John',
+        last_name: 'Developer',
+        display_name: 'John Developer',
+        avatar_url: '',
+        experience_level: 'first_deal',
+        property_focus: ['Single Family', 'Fix & Flip'],
+        actively_seeking_funding: true,
+        profile_bio: ''
+      });
+      setDeals([]);
+      setLoading(false);
+    } else {
       fetchProfile();
       fetchDeals();
     }
