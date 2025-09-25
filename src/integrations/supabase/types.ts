@@ -161,6 +161,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "deal_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       post_likes: {
@@ -226,6 +233,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -384,9 +398,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          deals_completed: number | null
+          display_name: string | null
+          experience_level: string | null
+          first_name: string | null
+          last_name: string | null
+          user_id: string | null
+          years_active: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          deals_completed?: number | null
+          display_name?: string | null
+          experience_level?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          user_id?: string | null
+          years_active?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          deals_completed?: number | null
+          display_name?: string | null
+          experience_level?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          user_id?: string | null
+          years_active?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      can_view_full_profile: {
+        Args: { _profile_user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
