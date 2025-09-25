@@ -267,6 +267,8 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
           ))}
         </CardContent>
       </Card>
+
+      {/* Lender Matching Section */}
     </div>
   );
 };

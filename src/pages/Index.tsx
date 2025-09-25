@@ -8,6 +8,7 @@ import { DealHistory } from "@/components/DealHistory";
 import { Resources } from "@/components/Resources";
 import { Feed } from "@/components/Feed";
 import { ProfilePage } from "@/pages/Profile";
+import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
 
 type AppState = "dashboard" | "form" | "results" | "history";
 
@@ -77,12 +78,19 @@ const Index = () => {
         );
       case "results":
         return (
-          <AnalysisResults 
-            score={analysisData?.score || 75}
-            onBack={handleBackToDashboard}
-            onResubmit={handleResubmit}
-            analysisResult={analysisData?.analysisResult}
-          />
+          <div className="min-h-screen bg-background">
+            <AnalysisResults 
+              score={analysisData?.score || 75}
+              onBack={handleBackToDashboard}
+              onResubmit={handleResubmit}
+              analysisResult={analysisData?.analysisResult}
+            />
+            {analysisData?.dealAnalysisId && (
+              <div className="max-w-6xl mx-auto p-6">
+                <LenderMatchingDashboard dealAnalysisId={analysisData.dealAnalysisId} />
+              </div>
+            )}
+          </div>
         );
       case "history":
         return (

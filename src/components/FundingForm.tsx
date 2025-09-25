@@ -133,7 +133,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
         }
 
         // Save to deal_analyses table with proper user association and input sanitization
-        const { error: analysisError } = await supabase
+        const { data: analysisData, error: analysisError } = await supabase
           .from('deal_analyses')
           .insert({
             user_id: user.id, // SECURITY: Always associate financial data with authenticated user
@@ -163,7 +163,9 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
             last_deal_profit: formData.lastDealProfit ? sanitizeInput(formData.lastDealProfit) : null,
             good_deal_criteria: formData.goodDeal ? sanitizeInput(formData.goodDeal) : null,
             analysis_score: score
-          });
+          })
+          .select()
+          .single();
 
         if (analysisError) {
           console.error('Error saving analysis:', analysisError);
