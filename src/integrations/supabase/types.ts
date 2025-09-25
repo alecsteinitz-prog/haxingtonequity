@@ -202,28 +202,34 @@ export type Database = {
       posts: {
         Row: {
           content: string
+          content_topics: Json | null
           created_at: string
           id: string
           is_reported: boolean
           likes_count: number
+          strategy_tags: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
           content: string
+          content_topics?: Json | null
           created_at?: string
           id?: string
           is_reported?: boolean
           likes_count?: number
+          strategy_tags?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
           content?: string
+          content_topics?: Json | null
           created_at?: string
           id?: string
           is_reported?: boolean
           likes_count?: number
+          strategy_tags?: Json | null
           updated_at?: string
           user_id?: string
         }
@@ -374,6 +380,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_type: string
+          interaction_value: number | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_type: string
+          interaction_value?: number | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          interaction_value?: number | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          engagement_patterns: Json | null
+          id: string
+          last_updated: string
+          preferred_strategies: Json | null
+          preferred_topics: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          engagement_patterns?: Json | null
+          id?: string
+          last_updated?: string
+          preferred_strategies?: Json | null
+          preferred_topics?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          engagement_patterns?: Json | null
+          id?: string
+          last_updated?: string
+          preferred_strategies?: Json | null
+          preferred_topics?: Json | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

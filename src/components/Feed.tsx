@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { PostCard } from "./PostCard";
+import { PostCardWithTracking } from "./PostCardWithTracking";
 import { CreatePost } from "./CreatePost";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { TrendingUp, Clock, Edit3, Plus } from "lucide-react";
+import { TrendingUp, Clock, Edit3, Plus, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useInteractionTracking } from "@/hooks/useInteractionTracking";
 
 interface Post {
   id: string;
@@ -27,72 +28,38 @@ interface Post {
 
 export const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [sortBy, setSortBy] = useState<"latest" | "popular" | "for_you">("for_you");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { trackLike, trackSave } = useInteractionTracking();
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
       
-      // Get posts with user profile data
-      const { data: postsData, error: postsError } = await supabase
-        .from("posts")
-        .select(`
-          id,
-          content,
-          likes_count,
-          created_at,
-          user_id,
-          profiles!posts_user_id_fkey (
-            display_name,
-            first_name,
-            last_name,
-            avatar_url,
-            experience_level
-          )
-        `)
-        .order(sortBy === "latest" ? "created_at" : "likes_count", { ascending: false })
-        .limit(50);
+      // If "For You" is selected and user is authenticated, use recommendation engine
+      if (sortBy === "for_you" && user) {
+        const { data: recommendedPosts, error: recError } = await supabase.functions.invoke(
+          'recommendation-engine',
+          { body: { userId: user.id } }
+        );
 
-      if (postsError) throw postsError;
+        if (recError) {
+          console.error('Recommendation engine error:', recError);
+          // Fallback to latest posts
+          return fetchRegularPosts();
+        }
 
-      // Get user's likes for these posts
-      let userLikes: string[] = [];
-      let userSavedStrategies: string[] = [];
-      
-      if (user && postsData) {
-        const postIds = postsData.map(post => post.id);
-        
-        const { data: likesData } = await supabase
-          .from("post_likes")
-          .select("post_id")
-          .eq("user_id", user.id)
-          .in("post_id", postIds);
-        
-        const { data: savedData } = await supabase
-          .from("saved_strategies")
-          .select("post_id")
-          .eq("user_id", user.id)
-          .in("post_id", postIds);
-        
-        userLikes = likesData?.map(like => like.post_id) || [];
-        userSavedStrategies = savedData?.map(saved => saved.post_id) || [];
+        if (recommendedPosts?.posts) {
+          await enrichPostsWithUserData(recommendedPosts.posts);
+          return;
+        }
       }
 
-      // Combine the data and filter out posts without profiles
-      const enrichedPosts = postsData
-        ?.filter(post => post.profiles !== null)
-        ?.map(post => ({
-          ...post,
-          profiles: post.profiles!,
-          user_liked: userLikes.includes(post.id),
-          user_saved: userSavedStrategies.includes(post.id)
-        })) || [];
-
-      setPosts(enrichedPosts);
+      // Regular post fetching for latest/popular or non-authenticated users
+      await fetchRegularPosts();
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast({
@@ -103,6 +70,68 @@ export const Feed = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchRegularPosts = async () => {
+    // Get posts with user profile data
+    const { data: postsData, error: postsError } = await supabase
+      .from("posts")
+      .select(`
+        id,
+        content,
+        likes_count,
+        created_at,
+        user_id,
+        profiles!posts_user_id_fkey (
+          display_name,
+          first_name,
+          last_name,
+          avatar_url,
+          experience_level
+        )
+      `)
+      .order(sortBy === "latest" ? "created_at" : "likes_count", { ascending: false })
+      .limit(50);
+
+    if (postsError) throw postsError;
+    await enrichPostsWithUserData(postsData);
+  };
+
+  const enrichPostsWithUserData = async (postsData: any[]) => {
+    // Get user's likes for these posts
+    let userLikes: string[] = [];
+    let userSavedStrategies: string[] = [];
+    
+    if (user && postsData) {
+      const postIds = postsData.map(post => post.id);
+      
+      const { data: likesData } = await supabase
+        .from("post_likes")
+        .select("post_id")
+        .eq("user_id", user.id)
+        .in("post_id", postIds);
+      
+      const { data: savedData } = await supabase
+        .from("saved_strategies")
+        .select("post_id")
+        .eq("user_id", user.id)
+        .in("post_id", postIds);
+      
+      userLikes = likesData?.map(like => like.post_id) || [];
+      userSavedStrategies = savedData?.map(saved => saved.post_id) || [];
+    }
+
+    // Combine the data and filter out posts without profiles
+    const enrichedPosts = postsData
+      ?.filter(post => post.profiles !== null)
+      ?.map(post => ({
+        ...post,
+        profiles: post.profiles!,
+        user_liked: userLikes.includes(post.id),
+        user_saved: userSavedStrategies.includes(post.id)
+      })) || [];
+
+    setPosts(enrichedPosts);
   };
 
   useEffect(() => {
@@ -130,6 +159,11 @@ export const Feed = () => {
           .from("post_likes")
           .insert({ user_id: user.id, post_id: postId });
         if (error) throw error;
+      }
+
+      // Track interaction for recommendations
+      if (!isLiked) {
+        trackLike(postId);
       }
 
       // Update local state
@@ -166,6 +200,9 @@ export const Feed = () => {
         });
 
       if (error) throw error;
+
+      // Track interaction for recommendations
+      trackSave(post.id);
 
       // Update local state
       setPosts(posts.map(p => 
@@ -264,11 +301,17 @@ export const Feed = () => {
       {/* Header and Sort Controls */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Community Feed</h2>
-        <Select value={sortBy} onValueChange={(value: "latest" | "popular") => setSortBy(value)}>
+        <Select value={sortBy} onValueChange={(value: "latest" | "popular" | "for_you") => setSortBy(value)}>
           <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="for_you">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                For You
+              </div>
+            </SelectItem>
             <SelectItem value="latest">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
@@ -293,7 +336,7 @@ export const Feed = () => {
           </div>
         ) : (
           posts.map(post => (
-            <PostCard
+            <PostCardWithTracking
               key={post.id}
               post={post}
               currentUserId={user?.id}

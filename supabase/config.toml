@@ -44,6 +44,9 @@ security_update_password_require_reauthentication = true
 [functions.lender-matching]
 verify_jwt = false
 
+[functions.recommendation-engine]
+verify_jwt = false
+
 [edge_runtime]
 policy = "per_worker"
 inspector_port = 8083
