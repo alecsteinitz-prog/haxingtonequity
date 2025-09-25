@@ -1,9 +1,43 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Youtube, BookOpen, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { InteractiveGlossary } from "@/components/InteractiveGlossary";
+
+interface GlossaryTerm {
+  id: string;
+  term: string;
+  definition: string;
+  category: string;
+}
 
 export const Resources = () => {
+  const [glossaryTerms, setGlossaryTerms] = useState<GlossaryTerm[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGlossaryTerms();
+  }, []);
+
+  const fetchGlossaryTerms = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('glossary_terms')
+        .select('*')
+        .eq('is_active', true)
+        .order('term', { ascending: true });
+
+      if (error) throw error;
+      setGlossaryTerms(data || []);
+    } catch (error) {
+      console.error('Error fetching glossary terms:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const blogPosts = [
     {
       title: "Why Off-Market Properties Can Be the Key to High ROI Investments?",
@@ -101,31 +135,22 @@ export const Resources = () => {
         <CardHeader className="pb-8 pt-8 px-8">
           <CardTitle className="text-2xl font-semibold">Popular Topics</CardTitle>
           <CardDescription className="text-base text-muted-foreground mt-2 leading-relaxed">
-            Key areas we cover in our educational content to help you succeed in real estate investing
+            Click on any term below to learn more about key real estate investment concepts
           </CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8">
-          <div className="flex flex-wrap gap-3">
-            {[
-              "Off-Market Properties",
-              "Direct Mail Marketing", 
-              "ROI Analysis",
-              "Investment Strategies",
-              "Market Analysis",
-              "Property Evaluation",
-              "Wholesaling",
-              "Fix & Flip",
-              "Buy & Hold"
-            ].map((topic) => (
-              <Badge 
-                key={topic} 
-                variant="secondary" 
-                className="text-sm px-4 py-2 font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-200 cursor-pointer"
-              >
-                {topic}
-              </Badge>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex flex-wrap gap-3">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="h-8 w-24 bg-muted rounded-full animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <InteractiveGlossary 
+              terms={glossaryTerms} 
+              className="animate-in fade-in-50 duration-500"
+            />
+          )}
         </CardContent>
       </Card>
     </div>
