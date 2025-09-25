@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface GlossaryTerm {
@@ -48,19 +47,9 @@ export const InteractiveGlossary = ({ terms, className }: InteractiveGlossaryPro
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md mx-4 rounded-lg shadow-xl border-0 bg-card">
           <DialogHeader className="space-y-4">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-semibold text-foreground pr-8">
-                {selectedTerm?.term}
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 rounded-full hover:bg-muted"
-                onClick={closeDialog}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-xl font-semibold text-foreground">
+              {selectedTerm?.term}
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
