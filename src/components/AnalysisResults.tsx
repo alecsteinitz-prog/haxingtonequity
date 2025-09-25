@@ -2,16 +2,57 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AnalysisResultsProps {
   score: number;
   onBack: () => void;
   onResubmit: () => void;
   analysisResult?: any;
+  formData?: any;
 }
 
-export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, formData }: AnalysisResultsProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
+
+  const handleSubmitForm = async () => {
+    if (!user || !formData) {
+      toast.error("Unable to submit form. Missing user or form data.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('submit-funding-form', {
+        body: {
+          formData: {
+            ...formData,
+            score,
+            analysisResult,
+            userEmail: user.email,
+            userName: `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || user.email
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Your form has been submitted successfully. Our team will review your deal and follow up shortly.");
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error("There was an issue submitting your form. Please try again or contact support.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
   // Use the actual score breakdown from analysis result
   const getScoreBreakdown = () => {
@@ -106,10 +147,22 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult }: A
           <Progress value={score} className="mb-4" />
           
           {score >= 80 ? (
-            <Button variant="gold" size="lg" className="w-full">
-              <Calendar className="w-4 h-4 mr-2" />
-              Book Funding Call
-            </Button>
+            <div className="space-y-3">
+              <Button 
+                variant="gold" 
+                size="lg" 
+                className="w-full"
+                onClick={handleSubmitForm}
+                disabled={isSubmitting}
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {isSubmitting ? "Submitting..." : "Submit Form"}
+              </Button>
+              <Button variant="outline" size="lg" className="w-full">
+                <Calendar className="w-4 h-4 mr-2" />
+                Book Funding Call
+              </Button>
+            </div>
           ) : (
             <Button variant="premium-outline" size="lg" className="w-full" onClick={onResubmit}>
               <RefreshCw className="w-4 h-4 mr-2" />

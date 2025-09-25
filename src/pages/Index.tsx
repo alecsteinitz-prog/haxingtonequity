@@ -16,6 +16,7 @@ const Index = () => {
   const [appState, setAppState] = useState<AppState>("dashboard");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [analysisData, setAnalysisData] = useState<any>(null);
+  const [formData, setFormData] = useState<any>(null);
 
   const handleStartAnalysis = () => {
     setAppState("form");
@@ -23,6 +24,7 @@ const Index = () => {
   };
 
   const handleFormSubmit = (data: any) => {
+    setFormData(data);
     setAnalysisData(data);
     setAppState("results");
   };
@@ -84,6 +86,7 @@ const Index = () => {
               onBack={handleBackToDashboard}
               onResubmit={handleResubmit}
               analysisResult={analysisData?.analysisResult}
+              formData={formData}
             />
             {analysisData?.dealAnalysisId && (
               <div className="max-w-6xl mx-auto p-6">
