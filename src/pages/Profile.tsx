@@ -134,14 +134,36 @@ export const ProfilePage = () => {
     if (!user || !profile) return;
 
     try {
+      // SECURITY: Validate and sanitize profile updates
+      const { validatePersonalData, sanitizeInput, logSecurityEvent } = await import('@/utils/inputValidation');
+      
+      const validationErrors = validatePersonalData(updates);
+      if (validationErrors.length > 0) {
+        toast.error(`Validation Error: ${validationErrors.join(', ')}`);
+        return;
+      }
+
+      // SECURITY: Sanitize text fields
+      const sanitizedUpdates = { ...updates };
+      if (sanitizedUpdates.first_name) sanitizedUpdates.first_name = sanitizeInput(sanitizedUpdates.first_name);
+      if (sanitizedUpdates.last_name) sanitizedUpdates.last_name = sanitizeInput(sanitizedUpdates.last_name);
+      if (sanitizedUpdates.display_name) sanitizedUpdates.display_name = sanitizeInput(sanitizedUpdates.display_name);
+      if (sanitizedUpdates.profile_bio) sanitizedUpdates.profile_bio = sanitizeInput(sanitizedUpdates.profile_bio);
+
+      // SECURITY: Log profile updates for monitoring
+      logSecurityEvent('profile_updated', { 
+        user_id: user.id, 
+        fields_updated: Object.keys(updates) 
+      });
+
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(sanitizedUpdates)
         .eq('user_id', user.id);
 
       if (error) throw error;
       
-      setProfile({ ...profile, ...updates });
+      setProfile({ ...profile, ...sanitizedUpdates });
       toast.success('Profile updated successfully');
       setEditMode(false);
     } catch (error) {

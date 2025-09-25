@@ -45,7 +45,7 @@ export type Database = {
           repairs_needed: boolean | null
           under_contract: boolean | null
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           analysis_score?: number | null
@@ -77,7 +77,7 @@ export type Database = {
           repairs_needed?: boolean | null
           under_contract?: boolean | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           analysis_score?: number | null
@@ -109,7 +109,7 @@ export type Database = {
           repairs_needed?: boolean | null
           under_contract?: boolean | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -445,6 +445,14 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      validate_email: {
+        Args: { email: string }
+        Returns: boolean
+      }
+      validate_financial_amount: {
+        Args: { amount: string }
         Returns: boolean
       }
     }

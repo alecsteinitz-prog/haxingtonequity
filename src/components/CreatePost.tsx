@@ -6,6 +6,7 @@ import { Textarea } from "./ui/textarea";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { validateContent, sanitizeInput, logSecurityEvent } from "@/utils/inputValidation";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -20,16 +21,52 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user || !content.trim()) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a post.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // SECURITY: Validate and sanitize content
+    const validationErrors = validateContent(content);
+    if (validationErrors.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: validationErrors.join(', '),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!content.trim()) {
+      toast({
+        title: "Error",
+        description: "Post content cannot be empty.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     
     try {
+      // SECURITY: Sanitize content before saving
+      const sanitizedContent = sanitizeInput(content.trim());
+      
+      // SECURITY: Log content creation for monitoring
+      logSecurityEvent('post_created', { 
+        user_id: user.id, 
+        content_length: sanitizedContent.length 
+      });
+
       const { error } = await supabase
         .from("posts")
         .insert({
           user_id: user.id,
-          content: content.trim()
+          content: sanitizedContent
         });
 
       if (error) throw error;

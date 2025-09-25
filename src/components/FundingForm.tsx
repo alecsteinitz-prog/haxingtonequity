@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileSync } from "@/hooks/useProfileSync";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -25,6 +26,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { syncEligibilityScore } = useProfileSync();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     fundingAmount: "",
     fundingPurpose: "",
@@ -108,37 +110,58 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       const analysisResult = analyzeDeal(mappedFormData);
       const score = analysisResult.overallScore;
       
+      // SECURITY: Validate user authentication before saving financial data
+      if (!user) {
+        toast.error('Authentication required for financial data submission');
+        setIsAnalyzing(false);
+        return;
+      }
+
       // Save to database
       try {
-        // Save to deal_analyses table
+        // SECURITY: Validate and sanitize input data
+        const { validateFinancialData, validatePropertyData, sanitizeInput } = await import('@/utils/inputValidation');
+        
+        const financialErrors = validateFinancialData(formData);
+        const propertyErrors = validatePropertyData(formData);
+        
+        if (financialErrors.length > 0 || propertyErrors.length > 0) {
+          const allErrors = [...financialErrors, ...propertyErrors];
+          toast.error(`Validation Error: ${allErrors.join(', ')}`);
+          setIsAnalyzing(false);
+          return;
+        }
+
+        // Save to deal_analyses table with proper user association and input sanitization
         const { error: analysisError } = await supabase
           .from('deal_analyses')
           .insert({
-            funding_amount: formData.fundingAmount,
-            funding_purpose: formData.fundingPurpose,
-            property_type: formData.propertyType,
-            property_details: formData.propertyDetails,
-            properties_count: formData.propertiesExperience,
-            credit_score: formData.creditScore,
-            bank_balance: formData.bankBalance,
-            annual_income: formData.annualIncome,
-            income_sources: formData.incomeSources,
+            user_id: user.id, // SECURITY: Always associate financial data with authenticated user
+            funding_amount: sanitizeInput(formData.fundingAmount),
+            funding_purpose: sanitizeInput(formData.fundingPurpose),
+            property_type: sanitizeInput(formData.propertyType),
+            property_details: sanitizeInput(formData.propertyDetails),
+            properties_count: sanitizeInput(formData.propertiesExperience),
+            credit_score: sanitizeInput(formData.creditScore),
+            bank_balance: sanitizeInput(formData.bankBalance),
+            annual_income: sanitizeInput(formData.annualIncome),
+            income_sources: sanitizeInput(formData.incomeSources),
             financial_assets: formData.financialAssets,
-            property_address: formData.propertyAddress,
-            property_info: formData.propertyInfo,
-            property_specific_info: formData.propertyDetails,
+            property_address: sanitizeInput(formData.propertyAddress),
+            property_info: formData.propertyInfo ? sanitizeInput(formData.propertyInfo) : null,
+            property_specific_info: sanitizeInput(formData.propertyDetails),
             under_contract: formData.underContract === 'Yes',
             owns_other_properties: formData.ownOtherProperties === 'Yes',
-            current_value: formData.currentValue,
+            current_value: formData.currentValue ? sanitizeInput(formData.currentValue) : null,
             repairs_needed: formData.repairsNeeded === 'Yes',
-            repair_level: formData.repairLevel,
-            rehab_costs: formData.rehabCosts,
-            arv_estimate: formData.arv,
+            repair_level: formData.repairLevel ? sanitizeInput(formData.repairLevel) : null,
+            rehab_costs: formData.rehabCosts ? sanitizeInput(formData.rehabCosts) : null,
+            arv_estimate: formData.arv ? sanitizeInput(formData.arv) : null,
             close_timeline: formData.closingDate ? formData.closingDate.toISOString() : null,
-            money_plans: formData.moneyPlan,
+            money_plans: formData.moneyPlan ? sanitizeInput(formData.moneyPlan) : null,
             past_deals: formData.pastDeals === 'Yes',
-            last_deal_profit: formData.lastDealProfit,
-            good_deal_criteria: formData.goodDeal,
+            last_deal_profit: formData.lastDealProfit ? sanitizeInput(formData.lastDealProfit) : null,
+            good_deal_criteria: formData.goodDeal ? sanitizeInput(formData.goodDeal) : null,
             analysis_score: score
           });
 
@@ -151,7 +174,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
         const { error: dealError } = await supabase
           .from('deal_history')
           .insert({
-            user_id: 'mock-user', // Use mock user since auth is disabled
+            user_id: user.id, // SECURITY: Always associate deal history with authenticated user
             property_type: formData.propertyType,
             city: formData.propertyAddress ? formData.propertyAddress.split(',')[0] : 'Unknown',
             state: formData.propertyAddress ? formData.propertyAddress.split(',')[1]?.trim() : null,
