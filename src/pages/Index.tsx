@@ -108,6 +108,7 @@ const Index = () => {
               analysisResult={analysisData?.analysisResult}
               formData={formData}
               onNavigateToFunding={handleNavigateToFunding}
+              dealAnalysisId={analysisData?.dealAnalysisId}
             />
             {analysisData?.dealAnalysisId && (
               <div className="max-w-6xl mx-auto p-6">

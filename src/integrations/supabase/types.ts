@@ -16,11 +16,15 @@ export type Database = {
     Tables: {
       deal_analyses: {
         Row: {
+          adjusted_arv: string | null
+          adjusted_score: number | null
           analysis_score: number | null
           annual_income: string | null
           arv_estimate: string | null
           bank_balance: string | null
           close_timeline: string | null
+          comps_confidence: number | null
+          comps_data: Json | null
           created_at: string
           credit_score: string
           current_value: string | null
@@ -48,11 +52,15 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          adjusted_arv?: string | null
+          adjusted_score?: number | null
           analysis_score?: number | null
           annual_income?: string | null
           arv_estimate?: string | null
           bank_balance?: string | null
           close_timeline?: string | null
+          comps_confidence?: number | null
+          comps_data?: Json | null
           created_at?: string
           credit_score: string
           current_value?: string | null
@@ -80,11 +88,15 @@ export type Database = {
           user_id: string
         }
         Update: {
+          adjusted_arv?: string | null
+          adjusted_score?: number | null
           analysis_score?: number | null
           annual_income?: string | null
           arv_estimate?: string | null
           bank_balance?: string | null
           close_timeline?: string | null
+          comps_confidence?: number | null
+          comps_data?: Json | null
           created_at?: string
           credit_score?: string
           current_value?: string | null
@@ -169,6 +181,126 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      funding_applications: {
+        Row: {
+          analysis_considerations: string[] | null
+          analysis_strengths: string[] | null
+          annual_income: string | null
+          arv_estimate: string | null
+          bank_balance: string | null
+          close_date: string | null
+          comfort_level: string | null
+          created_at: string
+          credit_score: string
+          current_value: string | null
+          email: string | null
+          email_sent: boolean | null
+          feasibility_score: number | null
+          financial_assets: string[] | null
+          first_name: string | null
+          funding_amount: string
+          funding_purpose: string
+          good_deal_criteria: string | null
+          id: string
+          income_sources: string | null
+          last_deal_profit: string | null
+          last_name: string | null
+          money_plans: string | null
+          owns_other_properties: boolean
+          past_deals: boolean
+          phone_number: string | null
+          properties_count: string
+          property_address: string
+          property_general_info: string | null
+          property_specific_info: string | null
+          property_type: string
+          rehab_costs: string | null
+          repairs_needed: string | null
+          submitted_at: string | null
+          under_contract: boolean
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          analysis_considerations?: string[] | null
+          analysis_strengths?: string[] | null
+          annual_income?: string | null
+          arv_estimate?: string | null
+          bank_balance?: string | null
+          close_date?: string | null
+          comfort_level?: string | null
+          created_at?: string
+          credit_score: string
+          current_value?: string | null
+          email?: string | null
+          email_sent?: boolean | null
+          feasibility_score?: number | null
+          financial_assets?: string[] | null
+          first_name?: string | null
+          funding_amount: string
+          funding_purpose: string
+          good_deal_criteria?: string | null
+          id?: string
+          income_sources?: string | null
+          last_deal_profit?: string | null
+          last_name?: string | null
+          money_plans?: string | null
+          owns_other_properties: boolean
+          past_deals: boolean
+          phone_number?: string | null
+          properties_count: string
+          property_address: string
+          property_general_info?: string | null
+          property_specific_info?: string | null
+          property_type: string
+          rehab_costs?: string | null
+          repairs_needed?: string | null
+          submitted_at?: string | null
+          under_contract: boolean
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          analysis_considerations?: string[] | null
+          analysis_strengths?: string[] | null
+          annual_income?: string | null
+          arv_estimate?: string | null
+          bank_balance?: string | null
+          close_date?: string | null
+          comfort_level?: string | null
+          created_at?: string
+          credit_score?: string
+          current_value?: string | null
+          email?: string | null
+          email_sent?: boolean | null
+          feasibility_score?: number | null
+          financial_assets?: string[] | null
+          first_name?: string | null
+          funding_amount?: string
+          funding_purpose?: string
+          good_deal_criteria?: string | null
+          id?: string
+          income_sources?: string | null
+          last_deal_profit?: string | null
+          last_name?: string | null
+          money_plans?: string | null
+          owns_other_properties?: boolean
+          past_deals?: boolean
+          phone_number?: string | null
+          properties_count?: string
+          property_address?: string
+          property_general_info?: string | null
+          property_specific_info?: string | null
+          property_type?: string
+          rehab_costs?: string | null
+          repairs_needed?: string | null
+          submitted_at?: string | null
+          under_contract?: boolean
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       glossary_terms: {
         Row: {
@@ -540,14 +672,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      validate_email: {
-        Args: { email: string }
-        Returns: boolean
-      }
-      validate_financial_amount: {
-        Args: { amount: string }
-        Returns: boolean
-      }
+      validate_email: { Args: { email: string }; Returns: boolean }
+      validate_financial_amount: { Args: { amount: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "investor" | "broker" | "lender"

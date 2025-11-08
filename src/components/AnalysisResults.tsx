@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send, ArrowDown } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send, ArrowDown, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoanRecommendations } from "./LoanRecommendations";
+import { CompsReview } from "./CompsReview";
 
 interface AnalysisResultsProps {
   score: number;
@@ -16,11 +18,14 @@ interface AnalysisResultsProps {
   analysisResult?: any;
   formData?: any;
   onNavigateToFunding?: (loanType?: string) => void;
+  dealAnalysisId?: string;
 }
 
-export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, formData, onNavigateToFunding }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, formData, onNavigateToFunding, dealAnalysisId }: AnalysisResultsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoanRecommendations, setShowLoanRecommendations] = useState(false);
+  const [currentScore, setCurrentScore] = useState(score);
+  const [activeTab, setActiveTab] = useState("results");
   const { user } = useAuth();
 
   const handleSubmitForm = async () => {
@@ -140,6 +145,11 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
     ];
   };
 
+  const handleScoreUpdate = (newScore: number) => {
+    setCurrentScore(newScore);
+    toast.success(`Score updated to ${newScore}%`);
+  };
+
   return (
     <div className="px-6 py-6">
       <div className="mb-6">
@@ -154,19 +164,33 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
         </div>
       </div>
 
-      {/* Score Display */}
-      <Card className="mb-6 shadow-premium bg-gradient-subtle border-0">
-        <CardContent className="p-8 text-center">
-          <div className="mb-4">
-            {getScoreIcon(score)}
-          </div>
-          <div className={`text-6xl font-bold mb-2 ${getScoreColor(score)}`}>
-            {score}%
-          </div>
-          <p className="text-lg font-semibold text-foreground mb-6">
-            Funding Feasibility Score
-          </p>
-          <Progress value={score} className="mb-4" />
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="results">
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Results
+          </TabsTrigger>
+          <TabsTrigger value="comps">
+            Review Comps
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="results" className="mt-6">
+
+        {/* Score Display */}
+        <Card className="mb-6 shadow-premium bg-gradient-subtle border-0">
+          <CardContent className="p-8 text-center">
+            <div className="mb-4">
+              {getScoreIcon(currentScore)}
+            </div>
+            <div className={`text-6xl font-bold mb-2 ${getScoreColor(currentScore)}`}>
+              {currentScore}%
+            </div>
+            <p className="text-lg font-semibold text-foreground mb-6">
+              Funding Feasibility Score
+            </p>
+            <Progress value={currentScore} className="mb-4" />
           
           <div className="space-y-3">
             <Button 
@@ -179,7 +203,7 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
               View Loan Options
             </Button>
             
-            {score >= 80 ? (
+            {currentScore >= 80 ? (
               <>
                 <Button 
                   variant="gold" 
@@ -355,16 +379,27 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
         </CardContent>
       </Card>
 
-      {/* Loan Recommendations Section */}
-      {showLoanRecommendations && (
-        <div id="loan-recommendations" className="mt-8 pt-6 border-t">
-          <LoanRecommendations 
+        {/* Loan Recommendations Section */}
+        {showLoanRecommendations && (
+          <div id="loan-recommendations" className="mt-8 pt-6 border-t">
+            <LoanRecommendations 
+              formData={formData}
+              score={currentScore}
+              onGetPreQualified={handleGetPreQualified}
+            />
+          </div>
+        )}
+        </TabsContent>
+
+        <TabsContent value="comps" className="mt-6">
+          <CompsReview 
+            dealAnalysisId={dealAnalysisId}
             formData={formData}
-            score={score}
-            onGetPreQualified={handleGetPreQualified}
+            originalScore={score}
+            onScoreUpdate={handleScoreUpdate}
           />
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
