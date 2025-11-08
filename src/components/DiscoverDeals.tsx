@@ -7,6 +7,7 @@ import { DealCard } from "./DealCard";
 import { Search, Filter, MapPin, DollarSign, Home, TrendingUp } from "lucide-react";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyDeal {
   id: string;
@@ -36,61 +37,31 @@ export const DiscoverDeals = () => {
 
   const handleSearch = async () => {
     setIsSearching(true);
-    // TODO: Integrate with real estate API
-    // For now, showing mock data
-    setTimeout(() => {
-      setDeals([
-        {
-          id: "1",
-          address: "123 Main Street",
+    try {
+      const { data, error } = await supabase.functions.invoke('rentcast-deals', {
+        body: {
           city: city || "Austin",
           state: "TX",
-          price: 250000,
-          arv: 320000,
-          roi: 28,
-          propertyType: "Single Family",
-          imageUrl: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800",
-          beds: 3,
-          baths: 2,
-          sqft: 1800,
-          lat: 30.2672,
-          lng: -97.7431
-        },
-        {
-          id: "2",
-          address: "456 Oak Avenue",
-          city: city || "Austin",
-          state: "TX",
-          price: 180000,
-          arv: 245000,
-          roi: 36,
-          propertyType: "Condo",
-          imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-          beds: 2,
-          baths: 2,
-          sqft: 1200,
-          lat: 30.2672,
-          lng: -97.7431
-        },
-        {
-          id: "3",
-          address: "789 Pine Road",
-          city: city || "Austin",
-          state: "TX",
-          price: 350000,
-          arv: 465000,
-          roi: 33,
-          propertyType: "Multi-Family",
-          imageUrl: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800",
-          beds: 4,
-          baths: 3,
-          sqft: 2400,
-          lat: 30.2672,
-          lng: -97.7431
+          maxPrice: maxBudget[0],
+          propertyType: propertyType === "all" ? undefined : propertyType,
+          limit: 20
         }
-      ]);
+      });
+
+      if (error) throw error;
+
+      // Filter by minimum ROI
+      const filteredDeals = (data?.deals || []).filter((deal: PropertyDeal) => 
+        deal.roi >= minROI[0] && deal.price <= maxBudget[0]
+      );
+
+      setDeals(filteredDeals);
+    } catch (error) {
+      console.error("Error fetching deals:", error);
+      setDeals([]);
+    } finally {
       setIsSearching(false);
-    }, 1500);
+    }
   };
 
   return (

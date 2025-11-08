@@ -47,6 +47,9 @@ verify_jwt = false
 [functions.recommendation-engine]
 verify_jwt = false
 
+[functions.rentcast-deals]
+verify_jwt = false
+
 [edge_runtime]
 policy = "per_worker"
 inspector_port = 8083
