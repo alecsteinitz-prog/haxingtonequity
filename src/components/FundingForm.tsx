@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,32 +27,59 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { syncEligibilityScore } = useProfileSync();
   const { user } = useAuth();
-  const [formData, setFormData] = useState({
-    fundingAmount: "",
-    fundingPurpose: "",
-    propertyType: "",
-    propertiesExperience: "",
-    creditScore: "",
-    bankBalance: "",
-    annualIncome: "",
-    incomeSources: "",
-    financialAssets: [] as string[],
-    propertyAddress: "",
-    propertyInfo: "",
-    propertyDetails: "",
-    underContract: "",
-    ownOtherProperties: "",
-    currentValue: "",
-    repairsNeeded: "",
-    repairLevel: "",
-    rehabCosts: "",
-    arv: "",
-    closingDate: null as Date | null,
-    moneyPlan: "",
-    pastDeals: "",
-    lastDealProfit: "",
-    goodDeal: "",
-  });
+  
+  // Load saved form data from localStorage on mount
+  const getInitialFormData = () => {
+    try {
+      const saved = localStorage.getItem('fundingFormData');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Convert date string back to Date object
+        if (parsed.closingDate) {
+          parsed.closingDate = new Date(parsed.closingDate);
+        }
+        return parsed;
+      }
+    } catch (error) {
+      console.error('Error loading saved form data:', error);
+    }
+    return {
+      fundingAmount: "",
+      fundingPurpose: "",
+      propertyType: "",
+      propertiesExperience: "",
+      creditScore: "",
+      bankBalance: "",
+      annualIncome: "",
+      incomeSources: "",
+      financialAssets: [] as string[],
+      propertyAddress: "",
+      propertyInfo: "",
+      propertyDetails: "",
+      underContract: "",
+      ownOtherProperties: "",
+      currentValue: "",
+      repairsNeeded: "",
+      repairLevel: "",
+      rehabCosts: "",
+      arv: "",
+      closingDate: null as Date | null,
+      moneyPlan: "",
+      pastDeals: "",
+      lastDealProfit: "",
+      goodDeal: "",
+    };
+  };
+  
+  const [formData, setFormData] = useState(getInitialFormData());
+  
+  // Show toast notification if form data was restored
+  useEffect(() => {
+    const saved = localStorage.getItem('fundingFormData');
+    if (saved) {
+      toast.info("Your previous form session has been restored. Continue where you left off!");
+    }
+  }, []);
 
   const totalSteps = 6;
   const progress = (currentStep / totalSteps) * 100;
@@ -192,29 +219,60 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
         } else {
           toast.success('Deal added to your history!');
         }
+        
+        // Sync eligibility score with profile
+        await syncEligibilityScore(score, analysisResult);
+        
+        setIsAnalyzing(false);
+        // Clear saved form data after successful submission
+        localStorage.removeItem('fundingFormData');
+        onSubmit({ 
+          ...formData, 
+          score, 
+          analysisResult,
+          dealAnalysisId: analysisData?.id 
+        });
       } catch (error) {
         console.error('Error saving analysis:', error);
+        setIsAnalyzing(false);
+        // Still submit even if there's an error saving to database
+        onSubmit({ 
+          ...formData, 
+          score, 
+          analysisResult
+        });
       }
-      
-      // Sync eligibility score with profile
-      await syncEligibilityScore(score, analysisResult);
-      
-      setIsAnalyzing(false);
-      onSubmit({ ...formData, score, analysisResult });
     }, 3000);
   };
 
   const updateFormData = (field: string, value: string | string[] | Date | null) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const updatedData = { ...formData, [field]: value };
+    setFormData(updatedData);
+    // Save to localStorage whenever form data changes
+    try {
+      localStorage.setItem('fundingFormData', JSON.stringify(updatedData));
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
   };
 
   const toggleAsset = (asset: string) => {
-    setFormData(prev => ({
-      ...prev,
-      financialAssets: prev.financialAssets.includes(asset)
-        ? prev.financialAssets.filter(a => a !== asset)
-        : [...prev.financialAssets, asset]
-    }));
+    const updatedAssets = formData.financialAssets.includes(asset)
+      ? formData.financialAssets.filter(a => a !== asset)
+      : [...formData.financialAssets, asset];
+    
+    const updatedData = {
+      ...formData,
+      financialAssets: updatedAssets
+    };
+    
+    setFormData(updatedData);
+    // Save to localStorage
+    try {
+      localStorage.setItem('fundingFormData', JSON.stringify(updatedData));
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
   };
 
   const handlePasteAnswers = async () => {
@@ -222,7 +280,7 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
       const clipboardText = await navigator.clipboard.readText();
       const pastedData = JSON.parse(clipboardText);
       
-      // Map the pasted data to form fields
+      // Map the pasted data to form fields with correct capitalization
       const mappedData = {
         fundingAmount: pastedData.fundingAmount || "",
         fundingPurpose: pastedData.fundingPurpose || "",
@@ -236,25 +294,64 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
         propertyAddress: pastedData.propertyAddress || "",
         propertyInfo: pastedData.propertyInfo || "",
         propertyDetails: pastedData.propertySpecificInfo || "",
-        underContract: pastedData.underContract ? "yes" : "no",
-        ownOtherProperties: pastedData.ownsOtherProperties ? "yes" : "no",
+        underContract: pastedData.underContract ? "Yes" : "No",
+        ownOtherProperties: pastedData.ownsOtherProperties ? "Yes" : "No",
         currentValue: pastedData.currentValue || "",
-        repairsNeeded: pastedData.repairsNeeded ? "yes" : "no",
+        repairsNeeded: pastedData.repairsNeeded ? "Yes" : "No",
         repairLevel: pastedData.repairLevel || "",
         rehabCosts: pastedData.rehabCosts || "",
         arv: pastedData.arvEstimate || "",
         closingDate: pastedData.closeTimeline ? new Date(pastedData.closeTimeline) : null,
         moneyPlan: pastedData.moneyPlans || "",
-        pastDeals: pastedData.pastDeals ? "yes" : "no",
+        pastDeals: pastedData.pastDeals ? "Yes" : "No",
         lastDealProfit: pastedData.lastDealProfit || "",
         goodDeal: pastedData.goodDealCriteria || ""
       };
       
-      setFormData(prev => ({ ...prev, ...mappedData }));
+      setFormData(mappedData);
+      // Save to localStorage
+      try {
+        localStorage.setItem('fundingFormData', JSON.stringify(mappedData));
+      } catch (error) {
+        console.error('Error saving pasted data:', error);
+      }
       toast.success("Previous answers pasted successfully!");
     } catch (error) {
+      console.error('Paste error:', error);
       toast.error("Failed to paste answers. Please make sure you copied valid form data.");
     }
+  };
+  
+  const handleClearForm = () => {
+    const emptyData = {
+      fundingAmount: "",
+      fundingPurpose: "",
+      propertyType: "",
+      propertiesExperience: "",
+      creditScore: "",
+      bankBalance: "",
+      annualIncome: "",
+      incomeSources: "",
+      financialAssets: [] as string[],
+      propertyAddress: "",
+      propertyInfo: "",
+      propertyDetails: "",
+      underContract: "",
+      ownOtherProperties: "",
+      currentValue: "",
+      repairsNeeded: "",
+      repairLevel: "",
+      rehabCosts: "",
+      arv: "",
+      closingDate: null as Date | null,
+      moneyPlan: "",
+      pastDeals: "",
+      lastDealProfit: "",
+      goodDeal: "",
+    };
+    setFormData(emptyData);
+    localStorage.removeItem('fundingFormData');
+    toast.success("Form cleared");
   };
 
   if (isAnalyzing) {
@@ -298,6 +395,14 @@ export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
           >
             <ClipboardPaste className="h-4 w-4" />
             Paste Previous
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleClearForm}
+            className="flex items-center gap-2"
+          >
+            Clear Form
           </Button>
         </div>
         <Progress value={progress} className="mb-2" />
