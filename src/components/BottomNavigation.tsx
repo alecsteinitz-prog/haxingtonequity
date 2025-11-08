@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, FileText, User, BookOpen, MessageCircle } from "lucide-react";
+import { Home, FileText, User, BookOpen, MessageCircle, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavigationProps {
@@ -10,6 +10,7 @@ interface BottomNavigationProps {
 export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => {
   const tabs = [
     { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "discover", label: "Discover", icon: Search },
     { id: "analysis", label: "Analysis", icon: FileText },
     { id: "feed", label: "Feed", icon: MessageCircle },
     { id: "resources", label: "Resources", icon: BookOpen },

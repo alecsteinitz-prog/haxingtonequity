@@ -9,6 +9,7 @@ import { Resources } from "@/components/Resources";
 import { Feed } from "@/components/Feed";
 import { ProfilePage } from "@/pages/Profile";
 import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
+import { DiscoverDeals } from "@/components/DiscoverDeals";
 
 type AppState = "dashboard" | "form" | "results" | "history";
 
@@ -55,6 +56,14 @@ const Index = () => {
       return (
         <div className="max-w-2xl mx-auto p-6">
           <Feed />
+        </div>
+      );
+    }
+    
+    if (activeTab === "discover") {
+      return (
+        <div className="max-w-7xl mx-auto p-6">
+          <DiscoverDeals />
         </div>
       );
     }
