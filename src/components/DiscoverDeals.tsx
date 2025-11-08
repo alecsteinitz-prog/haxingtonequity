@@ -34,8 +34,8 @@ export const DiscoverDeals = () => {
   const [country, setCountry] = useState("US");
   const [maxBudget, setMaxBudget] = useState([500000]);
   const [propertyType, setPropertyType] = useState("all");
-  const [bedrooms, setBedrooms] = useState("");
-  const [bathrooms, setBathrooms] = useState("");
+  const [bedrooms, setBedrooms] = useState("any");
+  const [bathrooms, setBathrooms] = useState("any");
   const [sqft, setSqft] = useState([0]);
   const [minROI, setMinROI] = useState([15]);
   const [isSearching, setIsSearching] = useState(false);
@@ -51,8 +51,8 @@ export const DiscoverDeals = () => {
           state: state,
           maxPrice: maxBudget[0],
           propertyType: propertyType === "all" ? undefined : propertyType,
-          bedrooms: bedrooms ? parseInt(bedrooms) : undefined,
-          bathrooms: bathrooms ? parseInt(bathrooms) : undefined,
+          bedrooms: bedrooms !== "any" ? parseInt(bedrooms) : undefined,
+          bathrooms: bathrooms !== "any" ? parseInt(bathrooms) : undefined,
           sqft: sqft[0] > 0 ? sqft[0] : undefined,
           limit: 20
         }
@@ -255,7 +255,7 @@ export const DiscoverDeals = () => {
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="any">Any</SelectItem>
                       <SelectItem value="1">1+</SelectItem>
                       <SelectItem value="2">2+</SelectItem>
                       <SelectItem value="3">3+</SelectItem>
@@ -273,7 +273,7 @@ export const DiscoverDeals = () => {
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="any">Any</SelectItem>
                       <SelectItem value="1">1+</SelectItem>
                       <SelectItem value="2">2+</SelectItem>
                       <SelectItem value="3">3+</SelectItem>
@@ -337,12 +337,12 @@ export const DiscoverDeals = () => {
                 <Search className="h-4 w-4 mr-2" />
                 {isSearching ? "Searching..." : "Find Deals"}
               </Button>
-              {(propertyType !== "all" || bedrooms || bathrooms || sqft[0] > 0 || maxBudget[0] < 1000000 || minROI[0] > 5) && (
+              {(propertyType !== "all" || bedrooms !== "any" || bathrooms !== "any" || sqft[0] > 0 || maxBudget[0] < 1000000 || minROI[0] > 5) && (
                 <Button 
                   onClick={() => {
                     setPropertyType("all");
-                    setBedrooms("");
-                    setBathrooms("");
+                    setBedrooms("any");
+                    setBathrooms("any");
                     setSqft([0]);
                     setMaxBudget([500000]);
                     setMinROI([15]);
