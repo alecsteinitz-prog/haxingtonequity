@@ -34,6 +34,9 @@ export const DiscoverDeals = () => {
   const [country, setCountry] = useState("US");
   const [maxBudget, setMaxBudget] = useState([500000]);
   const [propertyType, setPropertyType] = useState("all");
+  const [bedrooms, setBedrooms] = useState("");
+  const [bathrooms, setBathrooms] = useState("");
+  const [sqft, setSqft] = useState([0]);
   const [minROI, setMinROI] = useState([15]);
   const [isSearching, setIsSearching] = useState(false);
   const [deals, setDeals] = useState<PropertyDeal[]>([]);
@@ -48,6 +51,9 @@ export const DiscoverDeals = () => {
           state: state,
           maxPrice: maxBudget[0],
           propertyType: propertyType === "all" ? undefined : propertyType,
+          bedrooms: bedrooms ? parseInt(bedrooms) : undefined,
+          bathrooms: bathrooms ? parseInt(bathrooms) : undefined,
+          sqft: sqft[0] > 0 ? sqft[0] : undefined,
           limit: 20
         }
       });
@@ -220,24 +226,75 @@ export const DiscoverDeals = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="property-type" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Property Type
-                </Label>
-                <Select value={propertyType} onValueChange={setPropertyType}>
-                  <SelectTrigger id="property-type">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="single-family">Single Family</SelectItem>
-                    <SelectItem value="multi-family">Multi-Family</SelectItem>
-                    <SelectItem value="condo">Condo</SelectItem>
-                    <SelectItem value="townhouse">Townhouse</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <Home className="h-5 w-5" />
+                Property Features
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div className="space-y-2">
+                  <Label htmlFor="property-type">Property Type</Label>
+                  <Select value={propertyType} onValueChange={setPropertyType}>
+                    <SelectTrigger id="property-type">
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="single-family">Single Family</SelectItem>
+                      <SelectItem value="multi-family">Multi-Family</SelectItem>
+                      <SelectItem value="condo">Condo</SelectItem>
+                      <SelectItem value="townhouse">Townhouse</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bedrooms">Bedrooms</Label>
+                  <Select value={bedrooms} onValueChange={setBedrooms}>
+                    <SelectTrigger id="bedrooms">
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="1">1+</SelectItem>
+                      <SelectItem value="2">2+</SelectItem>
+                      <SelectItem value="3">3+</SelectItem>
+                      <SelectItem value="4">4+</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                      <SelectItem value="6">6+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bathrooms">Bathrooms</Label>
+                  <Select value={bathrooms} onValueChange={setBathrooms}>
+                    <SelectTrigger id="bathrooms">
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="1">1+</SelectItem>
+                      <SelectItem value="2">2+</SelectItem>
+                      <SelectItem value="3">3+</SelectItem>
+                      <SelectItem value="4">4+</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                      <SelectItem value="6">6+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Square Feet: {sqft[0] > 0 ? `${sqft[0].toLocaleString()}+` : 'Any'}</Label>
+                  <Slider
+                    value={sqft}
+                    onValueChange={setSqft}
+                    min={0}
+                    max={5000}
+                    step={250}
+                    className="w-full pt-2"
+                  />
+                </div>
               </div>
             </div>
 
@@ -271,14 +328,32 @@ export const DiscoverDeals = () => {
               />
             </div>
 
-            <Button 
-              onClick={handleSearch} 
-              className="w-full"
-              disabled={isSearching}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              {isSearching ? "Searching..." : "Find Deals"}
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleSearch} 
+                className="flex-1"
+                disabled={isSearching}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {isSearching ? "Searching..." : "Find Deals"}
+              </Button>
+              {(propertyType !== "all" || bedrooms || bathrooms || sqft[0] > 0 || maxBudget[0] < 1000000 || minROI[0] > 5) && (
+                <Button 
+                  onClick={() => {
+                    setPropertyType("all");
+                    setBedrooms("");
+                    setBathrooms("");
+                    setSqft([0]);
+                    setMaxBudget([500000]);
+                    setMinROI([15]);
+                    setDeals([]);
+                  }} 
+                  variant="outline"
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </CardContent>
         )}
       </Card>

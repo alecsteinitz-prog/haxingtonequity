@@ -10,6 +10,9 @@ interface PropertySearchParams {
   state: string;
   maxPrice?: number;
   propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  sqft?: number;
   limit?: number;
 }
 
@@ -20,9 +23,9 @@ serve(async (req) => {
   }
 
   try {
-    const { city, state, maxPrice, propertyType, limit = 10 } = await req.json() as PropertySearchParams;
+    const { city, state, maxPrice, propertyType, bedrooms, bathrooms, sqft, limit = 10 } = await req.json() as PropertySearchParams;
     
-    console.log('Searching for properties:', { city, state, maxPrice, propertyType });
+    console.log('Searching for properties:', { city, state, maxPrice, propertyType, bedrooms, bathrooms, sqft });
 
     const RENTCAST_API_KEY = Deno.env.get('RENTCAST_API_KEY');
     if (!RENTCAST_API_KEY) {
@@ -38,6 +41,15 @@ serve(async (req) => {
     }
     if (propertyType && propertyType !== 'all') {
       url.searchParams.append('propertyType', propertyType);
+    }
+    if (bedrooms) {
+      url.searchParams.append('bedrooms', bedrooms.toString());
+    }
+    if (bathrooms) {
+      url.searchParams.append('bathrooms', bathrooms.toString());
+    }
+    if (sqft) {
+      url.searchParams.append('squareFootage', sqft.toString());
     }
     url.searchParams.append('limit', limit.toString());
 
