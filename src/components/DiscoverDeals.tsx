@@ -8,6 +8,7 @@ import { Search, Filter, MapPin, DollarSign, Home, TrendingUp } from "lucide-rea
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface PropertyDeal {
   id: string;
@@ -27,6 +28,7 @@ interface PropertyDeal {
 }
 
 export const DiscoverDeals = () => {
+  const { toast } = useToast();
   const [city, setCity] = useState("");
   const [state, setState] = useState("TX");
   const [country, setCountry] = useState("US");
@@ -50,7 +52,36 @@ export const DiscoverDeals = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase function error:", error);
+        toast({
+          title: "Connection Error",
+          description: "Failed to connect to the property search service. Please try again.",
+          variant: "destructive",
+        });
+        setDeals([]);
+        return;
+      }
+
+      // Check for API-level errors
+      if (data?.error) {
+        console.error("Rentcast API error:", data.error);
+        toast({
+          title: "API Error",
+          description: data.error,
+          variant: "destructive",
+        });
+        setDeals([]);
+        return;
+      }
+
+      // Success message
+      if (data?.success && data?.message) {
+        toast({
+          title: "Success",
+          description: data.message,
+        });
+      }
 
       // Filter by minimum ROI
       const filteredDeals = (data?.deals || []).filter((deal: PropertyDeal) => 
@@ -58,8 +89,20 @@ export const DiscoverDeals = () => {
       );
 
       setDeals(filteredDeals);
+
+      if (filteredDeals.length === 0) {
+        toast({
+          title: "No Results",
+          description: "No properties found matching your criteria. Try adjusting your filters.",
+        });
+      }
     } catch (error) {
       console.error("Error fetching deals:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
       setDeals([]);
     } finally {
       setIsSearching(false);

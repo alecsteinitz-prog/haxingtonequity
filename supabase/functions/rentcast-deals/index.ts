@@ -79,7 +79,11 @@ serve(async (req) => {
     }));
 
     return new Response(
-      JSON.stringify({ deals }),
+      JSON.stringify({ 
+        deals,
+        success: true,
+        message: '✅ Rentcast API connected successfully'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -88,10 +92,20 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in rentcast-deals function:', error);
+    
+    // Provide more specific error messages
+    let userMessage = error.message;
+    if (error.message.includes('billing/subscription-inactive')) {
+      userMessage = 'Rentcast API subscription is inactive. Please activate your subscription at https://app.rentcast.io/app/api';
+    } else if (error.message.includes('auth/api-key-invalid')) {
+      userMessage = 'Rentcast API key is invalid. Please check your API key configuration.';
+    }
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        deals: [] 
+        error: userMessage,
+        deals: [],
+        success: false
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
