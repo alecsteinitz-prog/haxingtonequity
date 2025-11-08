@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send, ArrowDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { LoanRecommendations } from "./LoanRecommendations";
 
 interface AnalysisResultsProps {
   score: number;
@@ -14,10 +15,12 @@ interface AnalysisResultsProps {
   onResubmit: () => void;
   analysisResult?: any;
   formData?: any;
+  onNavigateToFunding?: (loanType?: string) => void;
 }
 
-export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, formData }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, formData, onNavigateToFunding }: AnalysisResultsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoanRecommendations, setShowLoanRecommendations] = useState(false);
   const { user } = useAuth();
 
   const handleSubmitForm = async () => {
@@ -52,6 +55,25 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleGetPreQualified = (loanType: string) => {
+    if (onNavigateToFunding) {
+      onNavigateToFunding(loanType);
+    } else {
+      toast.info(`Pre-qualification for ${loanType} - Feature coming soon!`);
+    }
+  };
+
+  const handleViewLoanOptions = () => {
+    setShowLoanRecommendations(true);
+    // Smooth scroll to loan recommendations
+    setTimeout(() => {
+      const element = document.getElementById('loan-recommendations');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
   
   // Use the actual score breakdown from analysis result
@@ -146,29 +168,41 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
           </p>
           <Progress value={score} className="mb-4" />
           
-          {score >= 80 ? (
-            <div className="space-y-3">
-              <Button 
-                variant="gold" 
-                size="lg" 
-                className="w-full"
-                onClick={handleSubmitForm}
-                disabled={isSubmitting}
-              >
-                <Send className="w-4 h-4 mr-2" />
-                {isSubmitting ? "Submitting..." : "Submit Form"}
-              </Button>
-              <Button variant="outline" size="lg" className="w-full">
-                <Calendar className="w-4 h-4 mr-2" />
-                Book Funding Call
-              </Button>
-            </div>
-          ) : (
-            <Button variant="premium-outline" size="lg" className="w-full" onClick={onResubmit}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Improve & Resubmit
+          <div className="space-y-3">
+            <Button 
+              variant="default"
+              size="lg" 
+              className="w-full"
+              onClick={handleViewLoanOptions}
+            >
+              <ArrowDown className="w-4 h-4 mr-2" />
+              View Loan Options
             </Button>
-          )}
+            
+            {score >= 80 ? (
+              <>
+                <Button 
+                  variant="gold" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleSubmitForm}
+                  disabled={isSubmitting}
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  {isSubmitting ? "Submitting..." : "Submit Form"}
+                </Button>
+                <Button variant="outline" size="lg" className="w-full">
+                  <Calendar className="w-4 w-4 mr-2" />
+                  Book Funding Call
+                </Button>
+              </>
+            ) : (
+              <Button variant="premium-outline" size="lg" className="w-full" onClick={onResubmit}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Improve & Resubmit
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -321,7 +355,16 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
         </CardContent>
       </Card>
 
-      {/* Lender Matching Section */}
+      {/* Loan Recommendations Section */}
+      {showLoanRecommendations && (
+        <div id="loan-recommendations" className="mt-8 pt-6 border-t">
+          <LoanRecommendations 
+            formData={formData}
+            score={score}
+            onGetPreQualified={handleGetPreQualified}
+          />
+        </div>
+      )}
     </div>
   );
 };

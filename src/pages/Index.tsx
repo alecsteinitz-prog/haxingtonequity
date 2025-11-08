@@ -39,6 +39,17 @@ const Index = () => {
     setAppState("form");
   };
 
+  const handleNavigateToFunding = (loanType?: string) => {
+    // Pre-fill form data with the selected loan type
+    if (loanType && formData) {
+      setFormData({
+        ...formData,
+        recommendedLoanType: loanType
+      });
+    }
+    setAppState("form");
+  };
+
   const handleViewHistory = () => {
     setAppState("history");
   };
@@ -96,6 +107,7 @@ const Index = () => {
               onResubmit={handleResubmit}
               analysisResult={analysisData?.analysisResult}
               formData={formData}
+              onNavigateToFunding={handleNavigateToFunding}
             />
             {analysisData?.dealAnalysisId && (
               <div className="max-w-6xl mx-auto p-6">
