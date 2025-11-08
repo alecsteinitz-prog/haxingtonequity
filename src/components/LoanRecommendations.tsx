@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { CheckCircle, TrendingUp, Calendar, DollarSign, Percent, Clock, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 interface LoanOption {
   id: string;
@@ -119,13 +120,11 @@ export const LoanRecommendations = ({ formData, score, onGetPreQualified }: Loan
     } else {
       if (selectedLoans.length < 3) {
         setSelectedLoans([...selectedLoans, loanId]);
+      } else {
+        toast.info("You can compare up to 3 loan options at once.");
       }
     }
   };
-
-  const displayedLoans = compareMode && selectedLoans.length > 0
-    ? loanOptions.filter(loan => selectedLoans.includes(loan.id))
-    : loanOptions;
 
   return (
     <div className="space-y-6 pb-20">
@@ -169,8 +168,8 @@ export const LoanRecommendations = ({ formData, score, onGetPreQualified }: Loan
       </Card>
 
       {/* Loan Cards */}
-      <div className={`grid gap-4 ${compareMode && selectedLoans.length > 0 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'}`}>
-        {displayedLoans.map((loan, index) => (
+      <div className={`grid gap-4 md:grid-cols-2`}>
+        {loanOptions.map((loan, index) => (
           <Card 
             key={loan.id} 
             className={`shadow-card relative ${compareMode ? 'cursor-pointer' : ''} ${
@@ -267,16 +266,18 @@ export const LoanRecommendations = ({ formData, score, onGetPreQualified }: Loan
               </p>
             </div>
             <div className="flex flex-wrap gap-3 justify-center">
-              {displayedLoans.map((loan) => (
-                <Button
-                  key={loan.id}
-                  variant="default"
-                  onClick={() => onGetPreQualified(loan.type)}
-                >
-                  Get Pre-Qualified: {loan.type}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              ))}
+              {loanOptions
+                .filter(loan => selectedLoans.includes(loan.id))
+                .map((loan) => (
+                  <Button
+                    key={loan.id}
+                    variant="default"
+                    onClick={() => onGetPreQualified(loan.type)}
+                  >
+                    Get Pre-Qualified: {loan.type}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ))}
             </div>
           </CardContent>
         </Card>
