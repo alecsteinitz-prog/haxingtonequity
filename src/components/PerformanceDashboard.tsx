@@ -291,13 +291,18 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
       {stats.recentAnalyses.length === 0 && (
         <Card className="shadow-card">
           <CardContent className="pt-6 text-center space-y-4">
-            <div className="flex items-center justify-center mx-auto">
+            <div className="flex items-center justify-center mx-auto mb-4">
               <img 
                 src={haxingtonLogo} 
                 alt="Haxington Equity logo"
                 role="img"
                 aria-label="Haxington Equity logo"
-                className="w-[88px] h-auto object-contain opacity-95 drop-shadow-sm dark:opacity-80"
+                className="object-contain opacity-95 drop-shadow-sm dark:opacity-80 transition-all duration-300"
+                style={{ 
+                  maxWidth: 'clamp(100px, 15vw, 150px)', 
+                  height: 'auto',
+                  width: '100%'
+                }}
               />
             </div>
             <div>
