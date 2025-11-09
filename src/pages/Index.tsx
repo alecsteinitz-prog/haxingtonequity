@@ -10,6 +10,7 @@ import { Feed } from "@/components/Feed";
 import { ProfilePage } from "@/pages/Profile";
 import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
 import { DiscoverDeals } from "@/components/DiscoverDeals";
+import { AdminDashboard } from "@/components/AdminDashboard";
 
 type AppState = "dashboard" | "form" | "results" | "history";
 
@@ -61,6 +62,10 @@ const Index = () => {
     
     if (activeTab === "profile") {
       return <ProfilePage />;
+    }
+    
+    if (activeTab === "admin") {
+      return <AdminDashboard />;
     }
     
     if (activeTab === "feed") {
@@ -130,7 +135,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {(appState === "dashboard" && activeTab === "dashboard") && <DashboardHeader />}
+      {(appState === "dashboard" && activeTab === "dashboard") && (
+        <DashboardHeader onAdminClick={() => setActiveTab("admin")} />
+      )}
       
       <div className="flex-1">
         {renderContent()}

@@ -3,13 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send, ArrowDown, BarChart3 } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, CheckCircle, AlertTriangle, XCircle, Calendar, RefreshCw, Send, ArrowDown, BarChart3, MessageCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoanRecommendations } from "./LoanRecommendations";
 import { CompsReview } from "./CompsReview";
+import { FeedbackModal } from "./FeedbackModal";
+import { useValidation } from "@/hooks/useValidation";
 
 interface AnalysisResultsProps {
   score: number;
@@ -26,7 +28,20 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
   const [showLoanRecommendations, setShowLoanRecommendations] = useState(false);
   const [currentScore, setCurrentScore] = useState(score);
   const [activeTab, setActiveTab] = useState("results");
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const { user } = useAuth();
+
+  // Background validation - runs silently
+  useValidation({
+    analysisId: dealAnalysisId || '',
+    analysisType: 'deal_analysis',
+    data: {
+      ...formData,
+      score,
+      ...analysisResult
+    },
+    enabled: !!dealAnalysisId
+  });
 
   const handleSubmitForm = async () => {
     if (!user || !formData) {
@@ -389,6 +404,17 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
             />
           </div>
         )}
+
+        {/* Send Feedback Link */}
+        <div className="mt-6 pt-4 border-t text-center">
+          <button
+            onClick={() => setFeedbackModalOpen(true)}
+            className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline inline-flex items-center gap-1"
+          >
+            <MessageCircle className="w-3 h-3" />
+            Send Feedback
+          </button>
+        </div>
         </TabsContent>
 
         <TabsContent value="comps" className="mt-6">
@@ -400,6 +426,13 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
           />
         </TabsContent>
       </Tabs>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        open={feedbackModalOpen}
+        onOpenChange={setFeedbackModalOpen}
+        analysisId={dealAnalysisId}
+      />
     </div>
   );
 };

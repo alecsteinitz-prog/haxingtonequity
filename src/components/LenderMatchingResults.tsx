@@ -6,6 +6,8 @@ import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { FeedbackModal } from './FeedbackModal';
+import { useValidation } from '@/hooks/useValidation';
 import { 
   TrendingUp, 
   Star, 
@@ -16,7 +18,8 @@ import {
   Brain,
   Target,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  MessageCircle
 } from 'lucide-react';
 
 interface LenderMatchingResultsProps {
@@ -61,7 +64,16 @@ interface MatchingResults {
 export const LenderMatchingResults = ({ dealAnalysisId }: LenderMatchingResultsProps) => {
   const [results, setResults] = useState<MatchingResults | null>(null);
   const [loading, setLoading] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const { toast } = useToast();
+
+  // Background validation for lender matching results
+  useValidation({
+    analysisId: dealAnalysisId,
+    analysisType: 'lender_match',
+    data: results?.dealMetrics || {},
+    enabled: !!results
+  });
 
   const analyzeLenders = async () => {
     setLoading(true);
@@ -359,6 +371,24 @@ export const LenderMatchingResults = ({ dealAnalysisId }: LenderMatchingResultsP
       <div className="text-center text-sm text-muted-foreground">
         Analysis completed at {new Date(results.analyzedAt).toLocaleString()}
       </div>
+
+      {/* Send Feedback Link */}
+      <div className="mt-4 text-center">
+        <button
+          onClick={() => setFeedbackModalOpen(true)}
+          className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline inline-flex items-center gap-1"
+        >
+          <MessageCircle className="w-3 h-3" />
+          Send Feedback
+        </button>
+      </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        open={feedbackModalOpen}
+        onOpenChange={setFeedbackModalOpen}
+        analysisId={dealAnalysisId}
+      />
     </div>
   );
 };

@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string
+          data_review_mode: boolean | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_review_mode?: boolean | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_review_mode?: boolean | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -216,6 +240,42 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      feedback_submissions: {
+        Row: {
+          analysis_id: string | null
+          created_at: string
+          feedback_type: string
+          id: string
+          notes: string | null
+          screenshot_url: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          created_at?: string
+          feedback_type: string
+          id?: string
+          notes?: string | null
+          screenshot_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_id?: string | null
+          created_at?: string
+          feedback_type?: string
+          id?: string
+          notes?: string | null
+          screenshot_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       follows: {
         Row: {
@@ -707,6 +767,36 @@ export type Database = {
         }
         Relationships: []
       }
+      validation_logs: {
+        Row: {
+          analysis_id: string
+          analysis_type: string
+          created_at: string
+          id: string
+          issues: Json | null
+          metadata: Json | null
+          validation_status: string
+        }
+        Insert: {
+          analysis_id: string
+          analysis_type: string
+          created_at?: string
+          id?: string
+          issues?: Json | null
+          metadata?: Json | null
+          validation_status: string
+        }
+        Update: {
+          analysis_id?: string
+          analysis_type?: string
+          created_at?: string
+          id?: string
+          issues?: Json | null
+          metadata?: Json | null
+          validation_status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_profiles: {
@@ -757,6 +847,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      validate_analysis_data: {
+        Args: { p_analysis_id: string; p_analysis_type: string; p_data: Json }
+        Returns: string
       }
       validate_email: { Args: { email: string }; Returns: boolean }
       validate_financial_amount: { Args: { amount: string }; Returns: boolean }

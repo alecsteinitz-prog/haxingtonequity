@@ -1,14 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, DollarSign, Users, User, Building2 } from "lucide-react";
+import { TrendingUp, DollarSign, Users, User, Building2, Shield } from "lucide-react";
 import haxingtonLogo from "@/assets/haxington-logo.png";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardHeaderProps {
   userName?: string;
+  onAdminClick?: () => void;
 }
 
-export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps) => {
+export const DashboardHeader = ({ userName = "Investor", onAdminClick }: DashboardHeaderProps) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!!data);
+    };
+
+    checkAdminStatus();
+  }, [user]);
   return (
     <div className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-primary" />
@@ -24,6 +47,15 @@ export const DashboardHeader = ({ userName = "Investor" }: DashboardHeaderProps)
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <button
+                onClick={onAdminClick}
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 backdrop-blur-sm hover:bg-yellow-500/30 transition-colors"
+                title="Admin Dashboard"
+              >
+                <Shield className="w-4 h-4 text-yellow-500" />
+              </button>
+            )}
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-secondary/20 backdrop-blur-sm">
               <User className="w-4 h-4 text-secondary" />
             </div>
