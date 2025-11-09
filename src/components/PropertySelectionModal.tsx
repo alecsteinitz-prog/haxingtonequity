@@ -73,14 +73,14 @@ export const PropertySelectionModal = ({
     setSelecting(true);
     
     // Show loading toast
-    toast.loading("Mapping fields...", { id: "mapping-fields" });
+    toast.loading("Mapping property data...", { id: "mapping-fields" });
     
     // Simulate brief loading for UX
     await new Promise(resolve => setTimeout(resolve, 800));
     
     onSelectProperty(property);
     toast.dismiss("mapping-fields");
-    toast.success("Property details pasted successfully!", {
+    toast.success("Property details imported successfully!", {
       duration: 3000,
     });
     
@@ -115,8 +115,8 @@ export const PropertySelectionModal = ({
           ) : properties.length === 0 ? (
             <div className="text-center py-12">
               <Home className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground">No saved properties found</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-base font-medium text-foreground mb-1">🏠 No saved properties found</p>
+              <p className="text-sm text-muted-foreground">
                 Complete and submit a form to save properties for future use
               </p>
             </div>
@@ -126,36 +126,61 @@ export const PropertySelectionModal = ({
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2 mb-2">
+                      <div className="flex items-start gap-2 mb-3">
                         <Home className="w-4 h-4 text-[#6C1F2E] mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">
+                          <p className="font-bold text-sm mb-1">
                             {property.property_address || "No address provided"}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-xs text-muted-foreground">
                             Saved on {formatDate(property.created_at)}
                           </p>
                         </div>
                       </div>
-                      {property.current_value && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Value: {property.current_value}
-                        </p>
-                      )}
+                      
+                      {/* Key property details */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {property.current_value && (
+                          <div>
+                            <span className="text-muted-foreground">Value: </span>
+                            <span className="font-medium">{property.current_value}</span>
+                          </div>
+                        )}
+                        {property.arv_estimate && (
+                          <div>
+                            <span className="text-muted-foreground">ARV: </span>
+                            <span className="font-medium">{property.arv_estimate}</span>
+                          </div>
+                        )}
+                        {property.rehab_costs && (
+                          <div>
+                            <span className="text-muted-foreground">Rehab: </span>
+                            <span className="font-medium">{property.rehab_costs}</span>
+                          </div>
+                        )}
+                        {property.under_contract !== null && (
+                          <div>
+                            <span className="text-muted-foreground">Status: </span>
+                            <span className="font-medium">
+                              {property.under_contract ? "Under Contract" : "Not Under Contract"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <Button
                       onClick={() => handleSelectProperty(property)}
                       disabled={selecting}
                       size="sm"
-                      className="bg-[#6C1F2E] hover:bg-[#821F2F] text-white rounded-xl flex-shrink-0"
+                      className="bg-[#6C1F2E] hover:bg-[#821F2F] text-white font-semibold rounded-xl flex-shrink-0"
                     >
                       {selecting ? (
                         <>
                           <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                          Selecting...
+                          Pasting...
                         </>
                       ) : (
-                        "Select"
+                        "Paste Info"
                       )}
                     </Button>
                   </div>
