@@ -70,25 +70,57 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Rentcast API response:', data);
+    console.log('Rentcast API response received, processing properties...');
 
-    // Transform Rentcast data to our format
-    const deals = (data || []).map((property: any) => ({
-      id: property.id || property.formattedAddress,
-      address: property.addressLine1 || property.formattedAddress,
-      city: property.city || city,
-      state: property.state || state,
-      price: property.price || property.assessedValue || 0,
-      arv: property.price ? Math.round(property.price * 1.15) : 0, // Estimate 15% appreciation
-      roi: 25, // Default ROI estimate - could be calculated based on rental estimates
-      propertyType: property.propertyType || 'Single Family',
-      imageUrl: property.photos?.[0] || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
-      beds: property.bedrooms || 0,
-      baths: property.bathrooms || 0,
-      sqft: property.squareFootage || 0,
-      lat: property.latitude || 0,
-      lng: property.longitude || 0,
-    }));
+    // Transform Rentcast data and fetch rental estimates
+    const dealsPromises = (data || []).map(async (property: any) => {
+      let estimatedPrice = 0;
+      let monthlyRent = 0;
+      
+      // Try to get rent estimate for better pricing
+      try {
+        const rentEstimateUrl = new URL('https://api.rentcast.io/v1/avm/rent/long-term');
+        rentEstimateUrl.searchParams.append('address', property.formattedAddress);
+        
+        const rentResponse = await fetch(rentEstimateUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'X-Api-Key': RENTCAST_API_KEY,
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (rentResponse.ok) {
+          const rentData = await rentResponse.json();
+          monthlyRent = rentData.rent || 0;
+          // Estimate property value using rent multiplier (typical 150-200x monthly rent)
+          estimatedPrice = monthlyRent > 0 ? Math.round(monthlyRent * 175) : 0;
+          console.log(`Rent estimate for ${property.formattedAddress}: $${monthlyRent}/mo, Est. value: $${estimatedPrice}`);
+        }
+      } catch (rentError) {
+        console.log(`Could not fetch rent estimate for ${property.formattedAddress}`);
+      }
+      
+      return {
+        id: property.id || property.formattedAddress,
+        address: property.addressLine1 || property.formattedAddress,
+        city: property.city || city,
+        state: property.state || state,
+        price: estimatedPrice,
+        arv: estimatedPrice > 0 ? Math.round(estimatedPrice * 1.15) : 0,
+        roi: monthlyRent > 0 && estimatedPrice > 0 ? Math.round((monthlyRent * 12 / estimatedPrice) * 100) : 25,
+        propertyType: property.propertyType || 'Apartment',
+        imageUrl: property.photos?.[0] || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
+        beds: property.bedrooms || 0,
+        baths: property.bathrooms || 0,
+        sqft: property.squareFootage || 0,
+        lat: property.latitude || 0,
+        lng: property.longitude || 0,
+        monthlyRent: monthlyRent,
+      };
+    });
+    
+    const deals = await Promise.all(dealsPromises);
 
     return new Response(
       JSON.stringify({ 
