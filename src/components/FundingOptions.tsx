@@ -207,28 +207,6 @@ export const FundingOptions = ({ onBack }: FundingOptionsProps) => {
         </div>
       </div>
 
-      {/* Selection Info */}
-      {selectedLoans.length > 0 && (
-        <Card className="shadow-card border-primary/20 bg-primary/5">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">
-                  {selectedLoans.length} loan{selectedLoans.length > 1 ? 's' : ''} selected
-                </span>
-              </div>
-              {selectedLoans.length >= 2 && (
-                <Button variant="premium" onClick={handleCompare}>
-                  Compare Loans Side-by-Side
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Loan Products */}
       <div className="space-y-4">
         {loanProducts.map((loan) => (
@@ -288,7 +266,29 @@ export const FundingOptions = ({ onBack }: FundingOptionsProps) => {
         ))}
       </div>
 
-      {/* Bottom CTA */}
+      {/* Selection Info - Moved Below Loan Products */}
+      {selectedLoans.length > 0 && (
+        <Card className="shadow-card border-primary/20 bg-primary/5 sticky bottom-24 z-10">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium text-foreground">
+                  {selectedLoans.length} loan{selectedLoans.length > 1 ? 's' : ''} selected
+                </span>
+              </div>
+              {selectedLoans.length >= 2 && (
+                <Button variant="premium" onClick={handleCompare} className="w-full sm:w-auto">
+                  Compare Loans Side-by-Side
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bottom CTA for users with no selections */}
       {selectedLoans.length === 0 && (
         <Card className="shadow-card">
           <CardContent className="pt-6 text-center">
