@@ -210,6 +210,7 @@ export const MyDealsPage = () => {
               <DealCard 
                 key={deal.id} 
                 deal={convertToPropertyDeal(deal)} 
+                mode="copy"
               />
             ))}
           </div>

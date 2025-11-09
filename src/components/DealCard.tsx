@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { MapPin, Bed, Bath, Maximize, TrendingUp, Save } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, TrendingUp, Save, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,9 +26,10 @@ interface PropertyDeal {
 
 interface DealCardProps {
   deal: PropertyDeal;
+  mode?: "save" | "copy"; // New prop to control button behavior
 }
 
-export const DealCard = ({ deal }: DealCardProps) => {
+export const DealCard = ({ deal, mode = "save" }: DealCardProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
@@ -93,6 +94,32 @@ export const DealCard = ({ deal }: DealCardProps) => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleCopyInfo = async () => {
+    const propertyInfo = `Property Address: ${deal.address}, ${deal.city}, ${deal.state}
+Property Type: ${deal.propertyType}
+Price: $${deal.price.toLocaleString()}
+ARV (After Repair Value): $${deal.arv.toLocaleString()}
+ROI: ${deal.roi}%
+Bedrooms: ${deal.beds}
+Bathrooms: ${deal.baths}
+Square Feet: ${deal.sqft.toLocaleString()}`;
+
+    try {
+      await navigator.clipboard.writeText(propertyInfo);
+      toast({
+        title: "Property info copied",
+        description: "You can now paste it into the Funding Eligibility Form.",
+      });
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast({
+        title: "Copy failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -168,14 +195,25 @@ export const DealCard = ({ deal }: DealCardProps) => {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        <Button 
-          onClick={handleSaveDeal} 
-          className="w-full"
-          disabled={isSaving}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          {isSaving ? "Saving..." : "Save to My Deals"}
-        </Button>
+        {mode === "copy" ? (
+          <Button 
+            onClick={handleCopyInfo} 
+            className="w-full"
+            variant="outline"
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copy the Info of the Property
+          </Button>
+        ) : (
+          <Button 
+            onClick={handleSaveDeal} 
+            className="w-full"
+            disabled={isSaving}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isSaving ? "Saving..." : "Save to My Deals"}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
