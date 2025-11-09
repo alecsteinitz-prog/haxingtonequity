@@ -39,7 +39,7 @@ export const DealCard = ({ deal }: DealCardProps) => {
     setIsSaving(true);
     try {
       // TEMPORARY: Bypass auth for development
-      const devUserId = 'dev_user_001'; // Using dev mode user ID
+      const devUserId = '00000000-0000-0000-0000-000000000001'; // Using dev mode user ID (valid UUID format)
       
       // const { data: { user } } = await supabase.auth.getUser();
       // if (!user) {
