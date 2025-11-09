@@ -81,28 +81,55 @@ export const DiscoverDeals = () => {
         return;
       }
 
+      console.log("API Response:", data);
+      console.log("Deals received:", data?.deals?.length || 0);
+
       // Success message
       if (data?.success && data?.message) {
         toast({
           title: "Success",
-          description: data.message,
+          description: `${data.message} - Found ${data?.deals?.length || 0} properties`,
         });
       }
 
-      // Filter by minimum ROI (only if we have price data)
-      const filteredDeals = (data?.deals || []).filter((deal: PropertyDeal) => {
-        // If no price data, include the property anyway
-        if (deal.price === 0) return true;
-        // If we have price data, apply ROI and budget filters
-        return deal.roi >= minROI[0] && deal.price <= maxBudget[0];
+      // Apply filters with more lenient logic
+      const allDeals = data?.deals || [];
+      console.log("All deals before filtering:", allDeals);
+      
+      const filteredDeals = allDeals.filter((deal: PropertyDeal) => {
+        // Always show properties without price data
+        if (!deal.price || deal.price === 0) {
+          console.log(`Including ${deal.address} - no price data yet`);
+          return true;
+        }
+        
+        // For properties with price data, check budget
+        if (deal.price > maxBudget[0]) {
+          console.log(`Filtering out ${deal.address} - price $${deal.price} exceeds budget $${maxBudget[0]}`);
+          return false;
+        }
+        
+        // Check ROI if available
+        if (deal.roi < minROI[0]) {
+          console.log(`Filtering out ${deal.address} - ROI ${deal.roi}% below minimum ${minROI[0]}%`);
+          return false;
+        }
+        
+        return true;
       });
 
+      console.log("Filtered deals:", filteredDeals.length);
       setDeals(filteredDeals);
 
       if (filteredDeals.length === 0) {
         toast({
           title: "No Results",
-          description: "No properties found matching your criteria. Try adjusting your filters.",
+          description: `Found ${allDeals.length} properties, but none matched your filters. Try adjusting your budget (${maxBudget[0].toLocaleString()}) or minimum ROI (${minROI[0]}%).`,
+        });
+      } else {
+        toast({
+          title: "Properties Found",
+          description: `Showing ${filteredDeals.length} of ${allDeals.length} properties`,
         });
       }
     } catch (error) {
