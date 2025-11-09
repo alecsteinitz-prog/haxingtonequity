@@ -8,6 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { TrendingUp, Clock, Edit3, Plus, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useInteractionTracking } from "@/hooks/useInteractionTracking";
+import { ReferralBanner } from "./ReferralBanner";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+
+const CATEGORIES = [
+  { value: "all", label: "All" },
+  { value: "fix-flip", label: "Fix & Flip" },
+  { value: "buy-hold", label: "Buy & Hold" },
+  { value: "funding-tips", label: "Funding Tips" },
+  { value: "market-insights", label: "Market Insights" },
+];
 
 interface Post {
   id: string;
@@ -15,6 +25,8 @@ interface Post {
   likes_count: number;
   created_at: string;
   user_id: string;
+  photo_url?: string;
+  category?: string;
   profiles: {
     display_name: string;
     first_name: string;
@@ -29,6 +41,7 @@ interface Post {
 export const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [sortBy, setSortBy] = useState<"latest" | "popular" | "for_you">("for_you");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -74,7 +87,7 @@ export const Feed = () => {
 
   const fetchRegularPosts = async () => {
     // Get posts with user profile data
-    const { data: postsData, error: postsError } = await supabase
+    let query = supabase
       .from("posts")
       .select(`
         id,
@@ -82,6 +95,8 @@ export const Feed = () => {
         likes_count,
         created_at,
         user_id,
+        photo_url,
+        category,
         profiles!posts_user_id_fkey (
           display_name,
           first_name,
@@ -89,7 +104,14 @@ export const Feed = () => {
           avatar_url,
           experience_level
         )
-      `)
+      `);
+
+    // Apply category filter
+    if (categoryFilter !== "all") {
+      query = query.eq("category", categoryFilter);
+    }
+
+    const { data: postsData, error: postsError } = await query
       .order(sortBy === "latest" ? "created_at" : "likes_count", { ascending: false })
       .limit(50);
 
@@ -136,7 +158,7 @@ export const Feed = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [sortBy, user]);
+  }, [sortBy, categoryFilter, user]);
 
   const handlePostCreated = () => {
     fetchPosts();
@@ -281,8 +303,8 @@ export const Feed = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* New Post Button - Visible for testing */}
+    <div className="space-y-6 pb-20">
+      {/* New Post Button */}
       <div className="text-center">
         <Button
           onClick={() => setShowCreatePost(!showCreatePost)}
@@ -295,7 +317,7 @@ export const Feed = () => {
         </Button>
       </div>
 
-      {/* Create Post Section - Visible for testing */}
+      {/* Create Post Section */}
       {showCreatePost && <CreatePost onPostCreated={handlePostCreated} />}
 
       {/* Header and Sort Controls */}
@@ -327,6 +349,20 @@ export const Feed = () => {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Category Filters */}
+      <Tabs value={categoryFilter} onValueChange={setCategoryFilter} className="w-full">
+        <TabsList className="w-full justify-start overflow-x-auto">
+          {CATEGORIES.map((category) => (
+            <TabsTrigger key={category.value} value={category.value}>
+              {category.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {/* Referral Banner */}
+      <ReferralBanner />
 
       {/* Posts Feed */}
       <div className="space-y-4">

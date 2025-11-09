@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_analyses: {
         Row: {
           adjusted_arv: string | null
@@ -181,6 +216,27 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       funding_applications: {
         Row: {
@@ -363,34 +419,40 @@ export type Database = {
       }
       posts: {
         Row: {
+          category: string | null
           content: string
           content_topics: Json | null
           created_at: string
           id: string
           is_reported: boolean
           likes_count: number
+          photo_url: string | null
           strategy_tags: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          category?: string | null
           content: string
           content_topics?: Json | null
           created_at?: string
           id?: string
           is_reported?: boolean
           likes_count?: number
+          photo_url?: string | null
           strategy_tags?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          category?: string | null
           content?: string
           content_topics?: Json | null
           created_at?: string
           id?: string
           is_reported?: boolean
           likes_count?: number
+          photo_url?: string | null
           strategy_tags?: Json | null
           updated_at?: string
           user_id?: string
@@ -505,6 +567,30 @@ export type Database = {
           updated_at?: string
           user_id?: string
           years_active?: number | null
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+          uses_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+          uses_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          uses_count?: number | null
         }
         Relationships: []
       }
