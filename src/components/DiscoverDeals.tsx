@@ -189,14 +189,9 @@ export const DiscoverDeals = () => {
 
       <Card>
         <CardHeader className="cursor-pointer" onClick={() => setShowFilters(!showFilters)}>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Search Filters
-            </span>
-            <Button variant="ghost" size="sm">
-              {showFilters ? "Hide" : "Show"}
-            </Button>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Search Filters
           </CardTitle>
         </CardHeader>
         {showFilters && (
