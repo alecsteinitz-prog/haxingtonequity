@@ -40,8 +40,15 @@ const Index = () => {
   };
 
   const handleBackToDashboard = () => {
+    console.log('handleBackToDashboard: Resetting to dashboard state');
     setAppState("dashboard");
     setActiveTab("dashboard");
+  };
+
+  const handleBackToAnalysisTab = () => {
+    console.log('handleBackToAnalysisTab: Resetting to analysis tab default view');
+    setAppState("dashboard");
+    // Keep activeTab as "analysis" - don't change it
   };
 
   const handleResubmit = () => {
@@ -170,7 +177,7 @@ const Index = () => {
         case "history":
           return (
             <DealHistory 
-              onBack={handleBackToDashboard}
+              onBack={handleBackToAnalysisTab}
             />
           );
         default:
