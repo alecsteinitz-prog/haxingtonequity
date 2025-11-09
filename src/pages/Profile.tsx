@@ -73,24 +73,35 @@ export const ProfilePage = () => {
   useEffect(() => {
     // For development mode without auth, create a mock profile
     if (!user) {
-      setProfile({
-        user_id: 'mock-user',
-        email: 'developer@example.com',
-        first_name: 'John',
-        last_name: 'Developer',
-        display_name: 'John Developer',
+      console.log('[DEV MODE] Creating mock profile for development');
+      const mockProfile: Profile = {
+        user_id: 'mock-user-dev',
+        email: 'developer@haxingtonequity.com',
+        first_name: 'Dev',
+        last_name: 'Mode',
+        display_name: 'Dev User',
         avatar_url: '',
-        experience_level: 'first_deal',
-        property_focus: ['Single Family', 'Fix & Flip'],
+        experience_level: '4-10_deals',
+        property_focus: ['Single Family', 'Fix & Flip', 'BRRRR'],
         actively_seeking_funding: true,
-        profile_bio: ''
-      });
+        profile_bio: 'This is a development mode profile. Sign in to see real data.',
+        funding_eligibility_score: 85,
+        last_eligibility_update: new Date().toISOString()
+      };
+      setProfile(mockProfile);
       setDeals([]);
       setLoading(false);
-    } else {
-      fetchProfile();
-      fetchDeals();
+      
+      toast.success('DEV MODE: Viewing mock profile', {
+        description: 'Authentication disabled for development',
+        duration: 3000
+      });
+      return;
     }
+    
+    // Normal authenticated flow
+    fetchProfile();
+    fetchDeals();
   }, [user]);
 
   const fetchProfile = async () => {
@@ -132,7 +143,18 @@ export const ProfilePage = () => {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user || !profile) return;
+    if (!profile) return;
+    
+    // DEV MODE: Just update local state without saving to database
+    if (!user) {
+      console.log('[DEV MODE] Profile update (not saved):', updates);
+      setProfile({ ...profile, ...updates });
+      toast.success('DEV MODE: Profile updated locally', {
+        description: 'Changes will not be saved (dev mode)',
+      });
+      setEditMode(false);
+      return;
+    }
 
     try {
       // SECURITY: Validate and sanitize profile updates
@@ -174,6 +196,14 @@ export const ProfilePage = () => {
   };
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // DEV MODE: Disable avatar upload
+    if (!user) {
+      toast.info('DEV MODE: Avatar upload disabled', {
+        description: 'Sign in to upload avatars',
+      });
+      return;
+    }
+    
     try {
       setUploading(true);
       
@@ -232,6 +262,15 @@ export const ProfilePage = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
+      {/* DEV MODE Banner */}
+      {!user && (
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 text-center">
+          <p className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
+            🔧 DEV MODE: Viewing mock profile data. Sign in to see real profile.
+          </p>
+        </div>
+      )}
+      
       {/* Profile Header */}
       <div className="text-center space-y-6">
         <div className="relative inline-block">
