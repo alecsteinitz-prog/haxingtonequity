@@ -41,9 +41,11 @@ interface DashboardStats {
 interface PerformanceDashboardProps {
   onStartAnalysis: () => void;
   onViewHistory: () => void;
+  onNavigateToImprove?: () => void;
+  onNavigateToFundingOptions?: () => void;
 }
 
-export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory }: PerformanceDashboardProps) => {
+export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigateToImprove, onNavigateToFundingOptions }: PerformanceDashboardProps) => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats>({
     ongoingProjects: 0,
@@ -182,6 +184,69 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory }: Perform
         <p className="text-sm text-muted-foreground">Real-time performance metrics and insights</p>
       </div>
 
+      {/* Ready to Get Started Section - Moved Above Quick Actions */}
+      {stats.recentAnalyses.length === 0 && (
+        <Card className="shadow-card">
+          <CardContent className="pt-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Brain className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
+              <p className="text-sm text-muted-foreground">
+                Complete your first deal analysis to unlock personalized insights
+              </p>
+            </div>
+            <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
+              Start Your First Analysis
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Quick Actions Bar - Updated with New Actions */}
+      <Card className="shadow-card border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <Button 
+            onClick={onViewHistory}
+            variant="premium" 
+            className="w-full justify-between"
+          >
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              View My Analysis History
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="premium"
+            className="w-full justify-between"
+            onClick={onNavigateToImprove}
+          >
+            <span className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Boost Your Score by 10%
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="premium"
+            className="w-full justify-between"
+            onClick={onNavigateToFundingOptions}
+          >
+            <span className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Discover Our Loan Options
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Summary Widgets */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="shadow-card">
@@ -296,47 +361,6 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory }: Perform
         </Card>
       )}
 
-      {/* Quick Actions Bar */}
-      <Card className="shadow-card border-primary/20">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          <Button 
-            onClick={onStartAnalysis}
-            variant="premium" 
-            className="w-full justify-between"
-          >
-            <span className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Start New Analysis
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline"
-            className="w-full justify-between"
-            onClick={onViewHistory}
-          >
-            <span className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              View Funding Options
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline"
-            className="w-full justify-between"
-          >
-            <span className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Join Community Feed
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* AI Insights Box */}
       {stats.latestInsight && (
         <Card className="shadow-card bg-primary/5 border-primary/20">
@@ -350,27 +374,6 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory }: Perform
                 <p className="text-sm text-muted-foreground">{stats.latestInsight}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Empty State for New Users */}
-      {stats.recentAnalyses.length === 0 && (
-        <Card className="shadow-card">
-          <CardContent className="pt-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Brain className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
-              <p className="text-sm text-muted-foreground">
-                Complete your first deal analysis to unlock personalized insights
-              </p>
-            </div>
-            <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
-              Start Your First Analysis
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
           </CardContent>
         </Card>
       )}

@@ -12,8 +12,11 @@ import { ProfilePage } from "@/pages/Profile";
 import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
 import { DiscoverDeals } from "@/components/DiscoverDeals";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { AnalysisHistory } from "@/components/AnalysisHistory";
+import { AnalysisImprove } from "@/components/AnalysisImprove";
+import { FundingOptions } from "@/components/FundingOptions";
 
-type AppState = "dashboard" | "form" | "results" | "history";
+type AppState = "dashboard" | "form" | "results" | "history" | "analysis-history" | "analysis-improve" | "funding-options";
 
 const Index = () => {
   const [appState, setAppState] = useState<AppState>("dashboard");
@@ -53,10 +56,50 @@ const Index = () => {
   };
 
   const handleViewHistory = () => {
-    setAppState("history");
+    setAppState("analysis-history");
+  };
+
+  const handleNavigateToImprove = () => {
+    setAppState("analysis-improve");
+  };
+
+  const handleNavigateToFundingOptions = () => {
+    setAppState("funding-options");
+  };
+
+  const handleViewAnalysisDetails = (analysisId: string) => {
+    // Navigate to analysis details - could be implemented later
+    console.log('View analysis details:', analysisId);
   };
 
   const renderContent = () => {
+    // Handle new routes
+    if (appState === "analysis-history") {
+      return (
+        <AnalysisHistory 
+          onBack={handleBackToDashboard}
+          onViewDetails={handleViewAnalysisDetails}
+        />
+      );
+    }
+
+    if (appState === "analysis-improve") {
+      return (
+        <AnalysisImprove 
+          onBack={handleBackToDashboard}
+          onStartAnalysis={handleStartAnalysis}
+        />
+      );
+    }
+
+    if (appState === "funding-options") {
+      return (
+        <FundingOptions 
+          onBack={handleBackToDashboard}
+        />
+      );
+    }
+
     if (activeTab === "resources") {
       return <Resources />;
     }
@@ -137,7 +180,14 @@ const Index = () => {
     }
 
     // Dashboard tab shows the new PerformanceDashboard
-    return <PerformanceDashboard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
+    return (
+      <PerformanceDashboard 
+        onStartAnalysis={handleStartAnalysis} 
+        onViewHistory={handleViewHistory}
+        onNavigateToImprove={handleNavigateToImprove}
+        onNavigateToFundingOptions={handleNavigateToFundingOptions}
+      />
+    );
   };
 
   return (
