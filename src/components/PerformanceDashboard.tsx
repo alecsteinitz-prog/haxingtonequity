@@ -264,60 +264,61 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
 
       {/* Quick Actions Bar */}
       <Card className="shadow-card border-primary/20">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div 
-            role="tablist" 
-            className="flex flex-wrap items-center gap-6"
-            aria-label="Quick action navigation"
-          >
-            <button
-              role="tab"
-              aria-selected={activeQuickAction === 'history'}
-              onClick={() => {
-                console.log('Quick Action: View My Analysis History clicked');
-                setActiveQuickAction('history');
-                onViewHistory();
-              }}
-              className={cn(
-                "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                "hover:bg-primary/10",
-                activeQuickAction === 'history'
-                  ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <span className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                View My Analysis History
-              </span>
-            </button>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h2 className="text-lg font-semibold">Quick Actions</h2>
             
-            <button
-              role="tab"
-              aria-selected={activeQuickAction === 'loans'}
-              onClick={() => {
-                console.log('Quick Action: Discover Loan Options clicked');
-                setActiveQuickAction('loans');
-                onNavigateToFundingOptions?.();
-              }}
-              className={cn(
-                "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                "hover:bg-primary/10",
-                activeQuickAction === 'loans'
-                  ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              )}
+            <div 
+              role="tablist" 
+              className="flex flex-wrap items-center gap-4"
+              aria-label="Quick action navigation"
             >
-              <span className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Discover Our Loan Options
-              </span>
-            </button>
+              <button
+                role="tab"
+                aria-selected={activeQuickAction === 'history'}
+                onClick={() => {
+                  console.log('Quick Action: View My Analysis History clicked');
+                  setActiveQuickAction('history');
+                  onViewHistory();
+                }}
+                className={cn(
+                  "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  "hover:bg-primary/10",
+                  activeQuickAction === 'history'
+                    ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  View My Analysis History
+                </span>
+              </button>
+              
+              <button
+                role="tab"
+                aria-selected={activeQuickAction === 'loans'}
+                onClick={() => {
+                  console.log('Quick Action: Discover Loan Options clicked');
+                  setActiveQuickAction('loans');
+                  onNavigateToFundingOptions?.();
+                }}
+                className={cn(
+                  "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  "hover:bg-primary/10",
+                  activeQuickAction === 'loans'
+                    ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Discover Our Loan Options
+                </span>
+              </button>
+            </div>
           </div>
         </CardContent>
       </Card>
