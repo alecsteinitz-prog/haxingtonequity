@@ -129,7 +129,7 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
                 <Calendar className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground mb-2">No analyses yet</h3>
+                <h3 className="font-semibold text-foreground mb-2">No analysis yet</h3>
                 <p className="text-sm text-muted-foreground">
                   You haven't completed any analyses yet. Start your first one below.
                 </p>
