@@ -41,11 +41,10 @@ interface DashboardStats {
 interface PerformanceDashboardProps {
   onStartAnalysis: () => void;
   onViewHistory: () => void;
-  onNavigateToImprove?: () => void;
   onNavigateToFundingOptions?: () => void;
 }
 
-export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigateToImprove, onNavigateToFundingOptions }: PerformanceDashboardProps) => {
+export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigateToFundingOptions }: PerformanceDashboardProps) => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats>({
     ongoingProjects: 0,
@@ -278,20 +277,6 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
             <span className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               View My Analysis History
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="premium"
-            className="w-full justify-between"
-            onClick={() => {
-              console.log('Quick Action: Boost Your Score clicked');
-              onNavigateToImprove?.();
-            }}
-          >
-            <span className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Boost Your Score by 10%
             </span>
             <ArrowRight className="h-4 w-4" />
           </Button>

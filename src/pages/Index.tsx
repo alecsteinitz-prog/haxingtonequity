@@ -13,11 +13,10 @@ import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
 import { DiscoverDeals } from "@/components/DiscoverDeals";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { AnalysisHistory } from "@/components/AnalysisHistory";
-import { AnalysisImprove } from "@/components/AnalysisImprove";
 import { FundingOptions } from "@/components/FundingOptions";
 import { DevModeBanner } from "@/components/DevModeBanner";
 
-type AppState = "dashboard" | "form" | "results" | "history" | "analysis-history" | "analysis-improve" | "funding-options";
+type AppState = "dashboard" | "form" | "results" | "history" | "analysis-history" | "funding-options";
 
 const Index = () => {
   const [appState, setAppState] = useState<AppState>("dashboard");
@@ -78,12 +77,6 @@ const Index = () => {
     // Keep activeTab as "analysis"
   };
 
-  const handleNavigateToImprove = () => {
-    console.log('handleNavigateToImprove: Navigating to analysis-improve');
-    setAppState("analysis-improve");
-    setActiveTab("dashboard");
-  };
-
   const handleNavigateToFundingOptions = () => {
     console.log('handleNavigateToFundingOptions: Navigating to funding-options');
     setAppState("funding-options");
@@ -102,15 +95,6 @@ const Index = () => {
         <AnalysisHistory 
           onBack={handleBackToDashboard}
           onViewDetails={handleViewAnalysisDetails}
-        />
-      );
-    }
-
-    if (appState === "analysis-improve") {
-      return (
-        <AnalysisImprove 
-          onBack={handleBackToDashboard}
-          onStartAnalysis={handleStartAnalysis}
         />
       );
     }
@@ -207,7 +191,6 @@ const Index = () => {
       <PerformanceDashboard 
         onStartAnalysis={handleStartAnalysis} 
         onViewHistory={handleViewHistory}
-        onNavigateToImprove={handleNavigateToImprove}
         onNavigateToFundingOptions={handleNavigateToFundingOptions}
       />
     );
