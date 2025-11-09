@@ -15,6 +15,7 @@ import { AdminDashboard } from "@/components/AdminDashboard";
 import { AnalysisHistory } from "@/components/AnalysisHistory";
 import { AnalysisImprove } from "@/components/AnalysisImprove";
 import { FundingOptions } from "@/components/FundingOptions";
+import { DevModeBanner } from "@/components/DevModeBanner";
 
 type AppState = "dashboard" | "form" | "results" | "history" | "analysis-history" | "analysis-improve" | "funding-options";
 
@@ -201,6 +202,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <DevModeBanner />
+      
       {(appState === "dashboard" && activeTab === "dashboard") && (
         <DashboardHeader onAdminClick={() => setActiveTab("admin")} />
       )}

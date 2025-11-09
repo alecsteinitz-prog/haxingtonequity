@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
+  const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
   if (loading) {
     return (
@@ -17,6 +18,12 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
+  // Developer Mode: Allow access without authentication
+  if (DEV_MODE) {
+    return <>{children}</>;
+  }
+
+  // Production Mode: Require authentication
   if (!user) {
     return <Navigate to="/auth" replace />;
   }

@@ -28,7 +28,41 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
   useEffect(() => {
+    // Developer Mode: Auto-login with mock user
+    if (DEV_MODE) {
+      console.log('🔧 Developer Mode Active - Using Mock User');
+      const mockUser = {
+        id: 'dev_user_001',
+        email: 'developer@test.com',
+        user_metadata: {
+          first_name: 'Dev',
+          last_name: 'User',
+          display_name: 'Dev User'
+        },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+      } as User;
+
+      const mockSession = {
+        user: mockUser,
+        access_token: 'mock_token',
+        refresh_token: 'mock_refresh',
+        expires_in: 3600,
+        expires_at: Date.now() + 3600000,
+        token_type: 'bearer',
+      } as Session;
+
+      setUser(mockUser);
+      setSession(mockSession);
+      setLoading(false);
+      return;
+    }
+
+    // Production Mode: Normal auth flow
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -46,7 +80,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [DEV_MODE]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
