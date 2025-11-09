@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { MapPin, Bed, Bath, Maximize, TrendingUp, Save, Copy } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, TrendingUp, Save, Copy, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,12 +27,14 @@ interface PropertyDeal {
 interface DealCardProps {
   deal: PropertyDeal;
   mode?: "save" | "copy"; // New prop to control button behavior
+  onDelete?: (dealId: string) => void; // Callback when deal is deleted
 }
 
-export const DealCard = ({ deal, mode = "save" }: DealCardProps) => {
+export const DealCard = ({ deal, mode = "save", onDelete }: DealCardProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -123,6 +125,39 @@ Square Feet: ${deal.sqft.toLocaleString()}`;
     }
   };
 
+  const handleDeleteDeal = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("deal_analyses")
+        .delete()
+        .eq("id", deal.id);
+
+      if (error) {
+        console.error("Error deleting deal:", error);
+        throw error;
+      }
+
+      toast({
+        title: "Property successfully removed from My Saved Deals.",
+      });
+
+      // Call the onDelete callback to update parent component
+      if (onDelete) {
+        onDelete(deal.id);
+      }
+    } catch (error) {
+      console.error("Error deleting deal:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove property. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative h-48 overflow-hidden bg-muted">
@@ -196,14 +231,25 @@ Square Feet: ${deal.sqft.toLocaleString()}`;
 
       <CardFooter className="p-4 pt-0">
         {mode === "copy" ? (
-          <Button 
-            onClick={handleCopyInfo} 
-            className="w-full"
-            variant="outline"
-          >
-            <Copy className="h-4 w-4 mr-2" />
-            Copy the Info of the Property
-          </Button>
+          <div className="flex gap-2 w-full">
+            <Button 
+              onClick={handleCopyInfo} 
+              className="flex-1"
+              variant="outline"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Copy the Info of the Property
+            </Button>
+            <Button 
+              onClick={handleDeleteDeal}
+              variant="destructive"
+              size="icon"
+              disabled={isDeleting}
+              className="shrink-0"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ) : (
           <Button 
             onClick={handleSaveDeal} 

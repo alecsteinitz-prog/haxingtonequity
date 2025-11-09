@@ -95,6 +95,12 @@ export const MyDealsPage = () => {
     setFilteredDeals(filtered);
   };
 
+  const handleDeleteDeal = (dealId: string) => {
+    // Remove from both arrays
+    setDeals(prevDeals => prevDeals.filter(deal => deal.id !== dealId));
+    setFilteredDeals(prevDeals => prevDeals.filter(deal => deal.id !== dealId));
+  };
+
   const convertToPropertyDeal = (deal: SavedDeal) => {
     const addressParts = deal.property_address.split(", ");
     const price = parseFloat(deal.funding_amount.replace(/[^0-9.-]+/g, "")) || 0;
@@ -217,6 +223,7 @@ export const MyDealsPage = () => {
                 key={deal.id} 
                 deal={convertToPropertyDeal(deal)} 
                 mode="copy"
+                onDelete={handleDeleteDeal}
               />
             ))}
           </div>
