@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import haxingtonLogo from "@/assets/haxington-logo-ready.png";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -290,8 +291,14 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
       {stats.recentAnalyses.length === 0 && (
         <Card className="shadow-card">
           <CardContent className="pt-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Brain className="h-8 w-8 text-primary" />
+            <div className="flex items-center justify-center mx-auto">
+              <img 
+                src={haxingtonLogo} 
+                alt="Haxington Equity logo"
+                role="img"
+                aria-label="Haxington Equity logo"
+                className="w-[88px] h-auto object-contain opacity-95 drop-shadow-sm dark:opacity-80"
+              />
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
