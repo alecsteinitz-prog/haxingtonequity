@@ -184,70 +184,7 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         <p className="text-sm text-muted-foreground">Real-time performance metrics and insights</p>
       </div>
 
-      {/* Ready to Get Started Section - Moved Above Quick Actions */}
-      {stats.recentAnalyses.length === 0 && (
-        <Card className="shadow-card">
-          <CardContent className="pt-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Brain className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
-              <p className="text-sm text-muted-foreground">
-                Complete your first deal analysis to unlock personalized insights
-              </p>
-            </div>
-            <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
-              Start Your First Analysis
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Quick Actions Bar - Updated with New Actions */}
-      <Card className="shadow-card border-primary/20">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          <Button 
-            onClick={onViewHistory}
-            variant="premium" 
-            className="w-full justify-between"
-          >
-            <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              View My Analysis History
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="premium"
-            className="w-full justify-between"
-            onClick={onNavigateToImprove}
-          >
-            <span className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Boost Your Score by 10%
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="premium"
-            className="w-full justify-between"
-            onClick={onNavigateToFundingOptions}
-          >
-            <span className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Discover Our Loan Options
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Summary Widgets */}
+      {/* Summary Widgets - Moved to top */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="shadow-card">
           <CardContent className="pt-6">
@@ -289,6 +226,69 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
           </CardContent>
         </Card>
       </div>
+
+      {/* Ready to Get Started Section */}
+      {stats.recentAnalyses.length === 0 && (
+        <Card className="shadow-card">
+          <CardContent className="pt-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Brain className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
+              <p className="text-sm text-muted-foreground">
+                Complete your first deal analysis to unlock personalized insights
+              </p>
+            </div>
+            <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
+              Start Your First Analysis
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Quick Actions Bar */}
+      <Card className="shadow-card border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <Button 
+            onClick={onViewHistory}
+            variant="premium" 
+            className="w-full justify-between"
+          >
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              View My Analysis History
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="premium"
+            className="w-full justify-between"
+            onClick={onNavigateToImprove}
+          >
+            <span className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Boost Your Score by 10%
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="premium"
+            className="w-full justify-between"
+            onClick={onNavigateToFundingOptions}
+          >
+            <span className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Discover Our Loan Options
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Deal Success Rate Chart */}
       {stats.categoryData.length > 0 && (
