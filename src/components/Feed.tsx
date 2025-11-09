@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { TrendingUp, Clock, Edit3, Plus, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useInteractionTracking } from "@/hooks/useInteractionTracking";
-import { ReferralBanner } from "./ReferralBanner";
 import { Leaderboard } from "./Leaderboard";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
@@ -363,9 +362,6 @@ export const Feed = () => {
           </TabsList>
         </Tabs>
       </div>
-
-      {/* Referral Banner */}
-      <ReferralBanner />
 
       {/* Leaderboard */}
       <Leaderboard />
