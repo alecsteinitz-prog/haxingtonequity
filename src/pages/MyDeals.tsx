@@ -126,7 +126,7 @@ export const MyDealsPage = () => {
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
-            onClick={() => window.history.back()}
+            onClick={() => window.location.href = "/"}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
