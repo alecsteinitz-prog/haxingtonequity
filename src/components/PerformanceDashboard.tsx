@@ -58,11 +58,16 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory }: Perform
   useEffect(() => {
     if (user) {
       fetchDashboardData();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
   const fetchDashboardData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       // Fetch all deal analyses for the user
