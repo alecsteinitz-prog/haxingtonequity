@@ -67,9 +67,15 @@ const Index = () => {
   };
 
   const handleViewHistory = () => {
-    console.log('handleViewHistory: Navigating to analysis-history');
+    console.log('handleViewHistory: Navigating to analysis-history from Dashboard');
     setAppState("analysis-history");
     setActiveTab("dashboard"); // Keep on dashboard tab
+  };
+
+  const handleViewHistoryFromAnalysis = () => {
+    console.log('handleViewHistoryFromAnalysis: Navigating to analysis-history from Analysis tab');
+    setAppState("history"); // Different state for Analysis tab context
+    // Keep activeTab as "analysis"
   };
 
   const handleNavigateToImprove = () => {
@@ -90,7 +96,7 @@ const Index = () => {
   };
 
   const renderContent = () => {
-    // Handle new routes
+    // Handle new routes from Dashboard Quick Actions
     if (appState === "analysis-history") {
       return (
         <AnalysisHistory 
@@ -181,7 +187,7 @@ const Index = () => {
             />
           );
         default:
-          return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
+          return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistoryFromAnalysis} />;
       }
     }
     
