@@ -72,12 +72,36 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Rentcast API response received, processing properties...');
 
-    // Transform Rentcast data and fetch rental estimates
+    // Transform Rentcast data and fetch value/rent estimates
     const dealsPromises = (data || []).map(async (property: any) => {
-      let estimatedPrice = 0;
+      let propertyValue = 0;
       let monthlyRent = 0;
       
-      // Try to get rent estimate for better pricing
+      // Fetch property value estimate (AVM)
+      try {
+        const valueEstimateUrl = new URL('https://api.rentcast.io/v1/avm/value');
+        valueEstimateUrl.searchParams.append('address', property.formattedAddress);
+        
+        const valueResponse = await fetch(valueEstimateUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'X-Api-Key': RENTCAST_API_KEY,
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (valueResponse.ok) {
+          const valueData = await valueResponse.json();
+          propertyValue = valueData.price || 0;
+          console.log(`Value estimate for ${property.formattedAddress}: $${propertyValue}`);
+        } else {
+          console.log(`Could not fetch value estimate for ${property.formattedAddress}`);
+        }
+      } catch (valueError) {
+        console.log(`Value estimate error for ${property.formattedAddress}:`, valueError);
+      }
+      
+      // Fetch rent estimate for ROI calculation
       try {
         const rentEstimateUrl = new URL('https://api.rentcast.io/v1/avm/rent/long-term');
         rentEstimateUrl.searchParams.append('address', property.formattedAddress);
@@ -93,9 +117,7 @@ serve(async (req) => {
         if (rentResponse.ok) {
           const rentData = await rentResponse.json();
           monthlyRent = rentData.rent || 0;
-          // Estimate property value using rent multiplier (typical 150-200x monthly rent)
-          estimatedPrice = monthlyRent > 0 ? Math.round(monthlyRent * 175) : 0;
-          console.log(`Rent estimate for ${property.formattedAddress}: $${monthlyRent}/mo, Est. value: $${estimatedPrice}`);
+          console.log(`Rent estimate for ${property.formattedAddress}: $${monthlyRent}/mo`);
         }
       } catch (rentError) {
         console.log(`Could not fetch rent estimate for ${property.formattedAddress}`);
@@ -113,17 +135,20 @@ serve(async (req) => {
         return propertyImages[type] || propertyImages['Single Family'];
       };
       
+      // Calculate realistic ROI and ARV
+      const calculatedARV = propertyValue > 0 ? Math.round(propertyValue * 1.1) : 0; // Conservative 10% appreciation
+      const cashOnCashROI = monthlyRent > 0 && propertyValue > 0 
+        ? Math.round(((monthlyRent * 12 * 0.5) / (propertyValue * 0.25)) * 100) // 25% down, 50% expense ratio
+        : 0;
+      
       return {
         id: property.id || property.formattedAddress,
         address: property.addressLine1 || property.formattedAddress,
         city: property.city || city,
         state: property.state || state,
-        price: estimatedPrice,
-        arv: estimatedPrice > 0 ? Math.round(estimatedPrice * 1.15) : 0,
-        // Calculate ROI more realistically: assume 50% operating expenses, cash-on-cash return
-        roi: monthlyRent > 0 && estimatedPrice > 0 
-          ? Math.round(((monthlyRent * 12 * 0.5) / (estimatedPrice * 0.25)) * 100) // Assumes 25% down payment, 50% expense ratio
-          : 25,
+        price: propertyValue,
+        arv: calculatedARV,
+        roi: cashOnCashROI,
         propertyType: property.propertyType || 'Apartment',
         imageUrl: getPlaceholderImage(property.propertyType || 'Single Family'),
         beds: property.bedrooms || 0,
@@ -132,8 +157,8 @@ serve(async (req) => {
         lat: property.latitude || 0,
         lng: property.longitude || 0,
         monthlyRent: monthlyRent,
-        grossYield: monthlyRent > 0 && estimatedPrice > 0 
-          ? Math.round((monthlyRent * 12 / estimatedPrice) * 100)
+        grossYield: monthlyRent > 0 && propertyValue > 0 
+          ? Math.round((monthlyRent * 12 / propertyValue) * 100)
           : 0,
       };
     });
