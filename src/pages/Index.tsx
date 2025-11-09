@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
-import { FundingAnalysisCard } from "@/components/FundingAnalysisCard";
+import { PerformanceDashboard } from "@/components/PerformanceDashboard";
 import { FundingForm } from "@/components/FundingForm";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -129,7 +129,7 @@ const Index = () => {
           />
         );
       default:
-        return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
+        return <PerformanceDashboard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
     }
   };
 
