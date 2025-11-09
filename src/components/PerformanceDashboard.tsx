@@ -291,37 +291,35 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
       {/* Investment Calculator */}
       <InvestmentCalculator />
 
-      {/* Ready to Get Started Section */}
-      {stats.recentAnalyses.length === 0 && (
-        <Card className="shadow-card">
-          <CardContent className="pt-6 text-center space-y-4">
-            <div className="flex items-center justify-center mx-auto mb-4">
-              <img 
-                src={haxingtonLogo} 
-                alt="Haxington Equity logo"
-                role="img"
-                aria-label="Haxington Equity logo"
-                className="object-contain opacity-95 drop-shadow-sm dark:opacity-80 transition-all duration-300"
-                style={{ 
-                  maxWidth: 'clamp(100px, 15vw, 150px)', 
-                  height: 'auto',
-                  width: '100%'
-                }}
-              />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-1">Ready to get started?</h3>
-              <p className="text-sm text-muted-foreground">
-                Complete your first deal analysis to unlock personalized insights
-              </p>
-            </div>
-            <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
-              Start Your First Analysis
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+      {/* Start My Analysis Section */}
+      <Card className="shadow-card">
+        <CardContent className="pt-6 text-center space-y-4">
+          <div className="flex items-center justify-center mx-auto mb-4">
+            <img 
+              src={haxingtonLogo} 
+              alt="Haxington Equity logo"
+              role="img"
+              aria-label="Haxington Equity logo"
+              className="object-contain opacity-95 drop-shadow-sm dark:opacity-80 transition-all duration-300"
+              style={{ 
+                maxWidth: 'clamp(100px, 15vw, 150px)', 
+                height: 'auto',
+                width: '100%'
+              }}
+            />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground mb-1">Ready to analyze your next deal?</h3>
+            <p className="text-sm text-muted-foreground">
+              Get instant feasibility analysis and funding recommendations
+            </p>
+          </div>
+          <Button onClick={onStartAnalysis} variant="premium" className="mt-4">
+            Start My Analysis
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions Bar */}
       <Card className="shadow-card border-primary/20">
@@ -384,93 +382,6 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         </CardContent>
       </Card>
 
-      {/* Deal Success Rate Chart */}
-      {stats.categoryData.length > 0 && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Deal Success Rate by Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.categoryData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="category" 
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                    tickLine={false}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="avgScore" radius={[8, 8, 0, 0]}>
-                    {stats.categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={getScoreColor(entry.avgScore)} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Recent Analysis Activity */}
-      {stats.recentAnalyses.length > 0 && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Recent Analysis Activity
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={onViewHistory}>
-                View All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {stats.recentAnalyses.map((analysis) => (
-              <div 
-                key={analysis.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors cursor-pointer"
-                onClick={onViewHistory}
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-foreground line-clamp-1">
-                    {analysis.property_address}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(analysis.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <Badge variant={analysis.analysis_score >= 80 ? "default" : "secondary"}>
-                  {analysis.analysis_score}%
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* AI Insights Box */}
-      {stats.latestInsight && (
-        <Card className="shadow-card bg-primary/5 border-primary/20">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Lightbulb className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm text-foreground mb-1">AI Insights</h3>
-                <p className="text-sm text-muted-foreground">{stats.latestInsight}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
