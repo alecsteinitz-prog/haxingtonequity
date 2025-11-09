@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, Plus, Trash2, TrendingUp, User, Building, Camera } from 'lucide-react';
 import { DealHistoryCard } from '@/components/DealHistoryCard';
+import { BadgesProgress } from '@/components/BadgesProgress';
 
 interface Profile {
   user_id: string;
@@ -311,10 +312,11 @@ export const ProfilePage = () => {
       </div>
 
       <Tabs defaultValue="experience" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="experience">Experience</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="experience">Experience</TabsTrigger>
+            <TabsTrigger value="badges">Badges</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
 
         <TabsContent value="experience" className="space-y-4">
           <Card>
@@ -385,6 +387,10 @@ export const ProfilePage = () => {
               )}
             </CardContent>
           </Card>
+         </TabsContent>
+
+        <TabsContent value="badges" className="space-y-4">
+          <BadgesProgress />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
