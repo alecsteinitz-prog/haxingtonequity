@@ -238,7 +238,7 @@ Square Feet: ${deal.sqft.toLocaleString()}`;
               variant="outline"
             >
               <Copy className="h-4 w-4 mr-2" />
-              Copy the Info of the Property
+              Copy Info
             </Button>
             <Button 
               onClick={handleDeleteDeal}
