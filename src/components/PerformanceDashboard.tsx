@@ -176,6 +176,30 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
     return "hsl(var(--destructive))";
   };
 
+  const getScoreLabel = (score: number): string => {
+    if (score === 0) return "N/A";
+    if (score < 60) return "Poor";
+    if (score >= 70 && score < 80) return "Fair";
+    if (score >= 95) return "Excellent";
+    if (score >= 80) return "Satisfying";
+    return "Fair"; // Fallback for 60-69 range
+  };
+
+  const getScoreBadgeVariant = (score: number): "default" | "secondary" | "destructive" => {
+    if (score === 0) return "secondary";
+    if (score < 60) return "destructive";
+    if (score >= 80) return "default";
+    return "secondary";
+  };
+
+  const getProgressBarColor = (score: number): string => {
+    if (score === 0) return "bg-gray-300";
+    if (score < 60) return "bg-red-500";
+    if (score >= 70 && score < 80) return "bg-yellow-400";
+    if (score >= 80) return "bg-green-500";
+    return "bg-yellow-400"; // Fallback for 60-69 range
+  };
+
   if (loading) {
     return (
       <div className="px-6 py-6 space-y-6">
@@ -231,12 +255,33 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
               <span className="text-xs font-medium">Average Feasibility Score</span>
             </div>
             <div className="flex items-end gap-3">
-              <p className="text-3xl font-bold text-foreground">{stats.avgScore}%</p>
-              <Badge variant={stats.avgScore >= 80 ? "default" : "secondary"} className="mb-1">
-                {stats.avgScore >= 80 ? "Excellent" : stats.avgScore >= 60 ? "Good" : "Fair"}
+              <p className={cn(
+                "text-3xl font-bold text-foreground",
+                stats.avgScore >= 95 && "animate-pulse"
+              )}>
+                {stats.avgScore === 0 ? "N/A" : `${stats.avgScore}%`}
+              </p>
+              <Badge 
+                variant={getScoreBadgeVariant(stats.avgScore)} 
+                className={cn(
+                  "mb-1 transition-all duration-300",
+                  stats.avgScore === 0 && "bg-gray-300 text-gray-700",
+                  stats.avgScore < 60 && stats.avgScore > 0 && "bg-red-500 text-white",
+                  stats.avgScore >= 70 && stats.avgScore < 80 && "bg-yellow-400 text-gray-900",
+                  stats.avgScore >= 80 && "bg-green-500 text-white"
+                )}
+              >
+                {getScoreLabel(stats.avgScore)}
               </Badge>
             </div>
-            <Progress value={stats.avgScore} className="mt-3" />
+            <Progress 
+              value={stats.avgScore} 
+              className="mt-3 bg-gray-200" 
+              indicatorClassName={cn(
+                "transition-all duration-300",
+                getProgressBarColor(stats.avgScore)
+              )}
+            />
           </CardContent>
         </Card>
       </div>
