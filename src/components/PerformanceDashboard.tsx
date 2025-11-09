@@ -265,34 +265,34 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3">
+        <CardContent className="grid gap-4">
           <Button 
             onClick={() => {
               console.log('Quick Action: View My Analysis History clicked');
               onViewHistory();
             }}
             variant="premium" 
-            className="w-full justify-between"
+            className="w-full justify-between py-6 px-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
           >
-            <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+            <span className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
               View My Analysis History
             </span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
           <Button 
             variant="premium"
-            className="w-full justify-between"
+            className="w-full justify-between py-6 px-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
             onClick={() => {
               console.log('Quick Action: Discover Loan Options clicked');
               onNavigateToFundingOptions?.();
             }}
           >
-            <span className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
+            <span className="flex items-center gap-3">
+              <DollarSign className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
               Discover Our Loan Options
             </span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </CardContent>
       </Card>
