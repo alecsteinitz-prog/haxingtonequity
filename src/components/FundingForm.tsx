@@ -9,13 +9,14 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { ArrowLeft, ArrowRight, Brain, CalendarIcon, ClipboardPaste } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, CalendarIcon, ClipboardPaste, Home } from "lucide-react";
 import heLogo from "@/assets/he-logo-new.png";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileSync } from "@/hooks/useProfileSync";
 import { useAuth } from "@/contexts/AuthContext";
+import { PropertySelectionModal } from "./PropertySelectionModal";
 
 interface FundingFormProps {
   onBack: () => void;
@@ -26,6 +27,7 @@ interface FundingFormProps {
 export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const { syncEligibilityScore } = useProfileSync();
   const { user } = useAuth();
   
@@ -355,6 +357,29 @@ export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingF
     toast.success("Form cleared");
   };
 
+  const handleSelectProperty = (property: any) => {
+    const updatedData = {
+      ...formData,
+      propertyAddress: property.property_address || "",
+      propertyInfo: property.property_info || "",
+      propertyDetails: property.property_specific_info || "",
+      underContract: property.under_contract ? "yes" : "no",
+      ownOtherProperties: property.owns_other_properties ? "yes" : "no",
+      currentValue: property.current_value || "",
+      repairsNeeded: property.repairs_needed ? "yes" : "no",
+      repairLevel: property.repair_level || "",
+      rehabCosts: property.rehab_costs || "",
+      arv: property.arv_estimate || "",
+    };
+    
+    setFormData(updatedData);
+    try {
+      localStorage.setItem('fundingFormData', JSON.stringify(updatedData));
+    } catch (error) {
+      console.error('Error saving property data:', error);
+    }
+  };
+
   if (isAnalyzing) {
     return (
       <div className="px-6 py-8">
@@ -605,6 +630,17 @@ export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingF
 
           {currentStep === 3 && (
             <>
+              <div className="mb-4">
+                <Button
+                  onClick={() => setIsPropertyModalOpen(true)}
+                  variant="outline"
+                  className="w-full bg-[#6C1F2E] hover:bg-[#821F2F] text-white border-0 rounded-xl"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Paste Property Info
+                </Button>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="propertyAddress">What is the address of the property?*</Label>
                 <Input 
@@ -677,6 +713,17 @@ export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingF
 
           {currentStep === 4 && (
             <>
+              <div className="mb-4">
+                <Button
+                  onClick={() => setIsPropertyModalOpen(true)}
+                  variant="outline"
+                  className="w-full bg-[#6C1F2E] hover:bg-[#821F2F] text-white border-0 rounded-xl"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Paste Property Info
+                </Button>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="currentValue">What is the current value of the property?*</Label>
                 <Input 
@@ -838,6 +885,12 @@ export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingF
           </div>
         </CardContent>
       </Card>
+      
+      <PropertySelectionModal
+        open={isPropertyModalOpen}
+        onOpenChange={setIsPropertyModalOpen}
+        onSelectProperty={handleSelectProperty}
+      />
     </div>
   );
 };
