@@ -30,6 +30,10 @@ interface DealCardProps {
 export const DealCard = ({ deal }: DealCardProps) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  const defaultFallbackImage = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80';
 
   const handleSaveDeal = async () => {
     setIsSaving(true);
@@ -79,12 +83,31 @@ export const DealCard = ({ deal }: DealCardProps) => {
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-muted">
+        {imageLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-muted">
+            <div className="animate-pulse text-muted-foreground">Loading...</div>
+          </div>
+        )}
         <img
-          src={deal.imageUrl}
-          alt={deal.address}
-          className="w-full h-full object-cover"
+          src={imageError ? defaultFallbackImage : deal.imageUrl}
+          alt={`${deal.address} - ${deal.propertyType}`}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            imageLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          onLoad={() => setImageLoading(false)}
+          onError={() => {
+            console.log(`Image failed to load for ${deal.address}, using fallback`);
+            setImageError(true);
+            setImageLoading(false);
+          }}
+          loading="lazy"
         />
+        {imageError && (
+          <div className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
+            Stock Image
+          </div>
+        )}
         <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground">
           <TrendingUp className="h-3 w-3 mr-1" />
           {deal.roi}% ROI

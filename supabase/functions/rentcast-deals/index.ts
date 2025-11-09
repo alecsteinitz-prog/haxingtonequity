@@ -101,6 +101,18 @@ serve(async (req) => {
         console.log(`Could not fetch rent estimate for ${property.formattedAddress}`);
       }
       
+      // Generate property type-specific placeholder images
+      const getPlaceholderImage = (type: string) => {
+        const propertyImages: Record<string, string> = {
+          'Single Family': 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
+          'Multi-Family': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+          'Condo': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+          'Townhouse': 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80',
+          'Apartment': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+        };
+        return propertyImages[type] || propertyImages['Single Family'];
+      };
+      
       return {
         id: property.id || property.formattedAddress,
         address: property.addressLine1 || property.formattedAddress,
@@ -113,7 +125,7 @@ serve(async (req) => {
           ? Math.round(((monthlyRent * 12 * 0.5) / (estimatedPrice * 0.25)) * 100) // Assumes 25% down payment, 50% expense ratio
           : 25,
         propertyType: property.propertyType || 'Apartment',
-        imageUrl: property.photos?.[0] || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
+        imageUrl: getPlaceholderImage(property.propertyType || 'Single Family'),
         beds: property.bedrooms || 0,
         baths: property.bathrooms || 0,
         sqft: property.squareFootage || 0,
