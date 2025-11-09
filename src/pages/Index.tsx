@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { PerformanceDashboard } from "@/components/PerformanceDashboard";
 import { FundingAnalysisCard } from "@/components/FundingAnalysisCard";
@@ -19,11 +20,29 @@ import { DevModeBanner } from "@/components/DevModeBanner";
 type AppState = "dashboard" | "form" | "results" | "history" | "analysis-history" | "funding-options";
 
 const Index = () => {
+  const location = useLocation();
   const [appState, setAppState] = useState<AppState>("dashboard");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [formData, setFormData] = useState<any>(null);
   const [selectedLoanTypes, setSelectedLoanTypes] = useState<string[]>([]);
+
+  // Handle navigation from other pages (like MyDeals)
+  useEffect(() => {
+    // Check for state from navigation
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+      setAppState("dashboard");
+    }
+    // Check for hash
+    else if (location.hash) {
+      const tab = location.hash.replace('#', '');
+      if (tab) {
+        setActiveTab(tab);
+        setAppState("dashboard");
+      }
+    }
+  }, [location]);
 
   // Debug logging
   console.log('Index render - appState:', appState, 'activeTab:', activeTab);

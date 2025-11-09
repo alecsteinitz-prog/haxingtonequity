@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DealCard } from "@/components/DealCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ interface SavedDeal {
 
 export const MyDealsPage = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<SavedDeal[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<SavedDeal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +128,11 @@ export const MyDealsPage = () => {
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
-            onClick={() => window.location.href = "/"}
+            onClick={() => {
+              navigate('/', { state: { activeTab: 'discover' } });
+              // Also try hash navigation as fallback
+              window.location.hash = 'discover';
+            }}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
