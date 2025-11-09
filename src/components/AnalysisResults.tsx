@@ -230,10 +230,6 @@ export const AnalysisResults = ({ score, onBack, onResubmit, analysisResult, for
                   <Send className="w-4 h-4 mr-2" />
                   {isSubmitting ? "Submitting..." : "Submit Form"}
                 </Button>
-                <Button variant="outline" size="lg" className="w-full">
-                  <Calendar className="w-4 w-4 mr-2" />
-                  Book Funding Call
-                </Button>
               </>
             ) : (
               <Button variant="premium-outline" size="lg" className="w-full" onClick={onResubmit}>
