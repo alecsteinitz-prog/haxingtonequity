@@ -239,6 +239,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "deal_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_leaderboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       feedback_submissions: {
@@ -532,6 +539,13 @@ export type Database = {
             referencedRelation: "public_profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_leaderboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       profiles: {
@@ -689,6 +703,42 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          badge_type: string
+          created_at: string
+          earned_at: string
+          id: string
+          is_earned: boolean
+          progress: number
+          target: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          created_at?: string
+          earned_at?: string
+          id?: string
+          is_earned?: boolean
+          progress?: number
+          target: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          created_at?: string
+          earned_at?: string
+          id?: string
+          is_earned?: boolean
+          progress?: number
+          target?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_interactions: {
         Row: {
           created_at: string
@@ -835,6 +885,17 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_leaderboard: {
+        Row: {
+          analyses_count: number | null
+          avatar_url: string | null
+          display_name: string | null
+          first_name: string | null
+          last_name: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_view_full_profile: {
@@ -847,6 +908,15 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      update_badge_progress: {
+        Args: {
+          p_badge_type: string
+          p_progress: number
+          p_target: number
+          p_user_id: string
+        }
+        Returns: undefined
       }
       validate_analysis_data: {
         Args: { p_analysis_id: string; p_analysis_type: string; p_data: Json }
