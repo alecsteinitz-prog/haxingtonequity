@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,7 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
     latestInsight: ""
   });
   const [loading, setLoading] = useState(true);
+  const [activeQuickAction, setActiveQuickAction] = useState<'history' | 'loans' | null>(null);
 
   useEffect(() => {
     console.log('PerformanceDashboard: user state changed', user ? 'User exists' : 'No user');
@@ -265,35 +267,58 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <Button 
-            onClick={() => {
-              console.log('Quick Action: View My Analysis History clicked');
-              onViewHistory();
-            }}
-            variant="premium" 
-            className="w-full justify-between py-6 px-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
+        <CardContent>
+          <div 
+            role="tablist" 
+            className="flex flex-wrap items-center gap-6"
+            aria-label="Quick action navigation"
           >
-            <span className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-              View My Analysis History
-            </span>
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-          </Button>
-          <Button 
-            variant="premium"
-            className="w-full justify-between py-6 px-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
-            onClick={() => {
-              console.log('Quick Action: Discover Loan Options clicked');
-              onNavigateToFundingOptions?.();
-            }}
-          >
-            <span className="flex items-center gap-3">
-              <DollarSign className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-              Discover Our Loan Options
-            </span>
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-          </Button>
+            <button
+              role="tab"
+              aria-selected={activeQuickAction === 'history'}
+              onClick={() => {
+                console.log('Quick Action: View My Analysis History clicked');
+                setActiveQuickAction('history');
+                onViewHistory();
+              }}
+              className={cn(
+                "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                "hover:bg-primary/10",
+                activeQuickAction === 'history'
+                  ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
+                  : "bg-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                View My Analysis History
+              </span>
+            </button>
+            
+            <button
+              role="tab"
+              aria-selected={activeQuickAction === 'loans'}
+              onClick={() => {
+                console.log('Quick Action: Discover Loan Options clicked');
+                setActiveQuickAction('loans');
+                onNavigateToFundingOptions?.();
+              }}
+              className={cn(
+                "relative px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                "hover:bg-primary/10",
+                activeQuickAction === 'loans'
+                  ? "bg-[#F6EDEF] text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-full"
+                  : "bg-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Discover Our Loan Options
+              </span>
+            </button>
+          </div>
         </CardContent>
       </Card>
 
