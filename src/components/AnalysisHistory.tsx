@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, MapPin, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, TrendingUp, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Analysis {
   id: string;
@@ -14,6 +15,7 @@ interface Analysis {
   funding_purpose: string;
   funding_amount: string;
   property_type: string;
+  adjusted_score?: number;
 }
 
 interface AnalysisHistoryProps {
@@ -33,7 +35,10 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
   }, [user]);
 
   const fetchAnalyses = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -42,7 +47,11 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching analyses:', error);
+        toast.error('Failed to load analysis history');
+        throw error;
+      }
 
       setAnalyses(data || []);
     } catch (error) {
@@ -53,18 +62,44 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
   };
 
   const getStatusBadge = (score: number) => {
-    if (score >= 80) return { label: "Excellent", variant: "default" as const };
-    if (score >= 60) return { label: "Good", variant: "secondary" as const };
-    return { label: "Needs Improvement", variant: "outline" as const };
+    if (score >= 80) return { label: "Eligible", variant: "default" as const, color: "text-green-600" };
+    if (score >= 60) return { label: "Needs Review", variant: "secondary" as const, color: "text-yellow-600" };
+    return { label: "Not Eligible", variant: "outline" as const, color: "text-red-600" };
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
   if (loading) {
     return (
-      <div className="px-6 py-6 space-y-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/2" />
-          <div className="h-24 bg-muted rounded" />
-          <div className="h-24 bg-muted rounded" />
+      <div className="min-h-screen bg-background px-6 py-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">My Analysis History</h1>
+            <p className="text-sm text-muted-foreground">Loading your analyses...</p>
+          </div>
+        </div>
+        
+        {/* Loading Skeleton */}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="shadow-card">
+              <CardContent className="pt-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-5 bg-muted rounded w-3/4" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-1/4" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -78,18 +113,41 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Analysis History</h1>
+          <h1 className="text-2xl font-bold text-foreground">My Analysis History</h1>
           <p className="text-sm text-muted-foreground">View all your past deal analyses</p>
         </div>
       </div>
 
       {/* Analysis List */}
-      {analyses.length === 0 ? (
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="shadow-card">
+              <CardContent className="pt-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-5 bg-muted rounded w-3/4" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-1/4" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : analyses.length === 0 ? (
         <Card className="shadow-card">
           <CardContent className="pt-6 text-center space-y-4">
-            <p className="text-muted-foreground">No analyses found. Start your first analysis!</p>
-            <Button onClick={onBack} variant="premium">
-              Start Analysis
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Calendar className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-2">No analyses yet</h3>
+              <p className="text-sm text-muted-foreground">
+                You haven't completed any analyses yet. Start your first one below.
+              </p>
+            </div>
+            <Button onClick={onBack} variant="premium" size="lg">
+              Start New Analysis
+              <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>
         </Card>
@@ -102,33 +160,35 @@ export const AnalysisHistory = ({ onBack, onViewDetails }: AnalysisHistoryProps)
                 <CardContent className="pt-6">
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="font-semibold text-foreground line-clamp-1">
-                            {analysis.property_address}
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(analysis.created_at).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
-                          })}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {analysis.property_type} • {analysis.funding_purpose?.replace('_', ' ')}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-foreground mb-1">
-                          {analysis.analysis_score || 0}%
-                        </div>
-                        <Badge variant={status.variant}>
-                          {status.label}
-                        </Badge>
-                      </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="font-semibold text-foreground line-clamp-1">
+                        {analysis.property_address || 'Property Address Not Provided'}
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(analysis.created_at).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        {analysis.property_type} • {analysis.funding_purpose?.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <div className={`text-2xl font-bold ${getScoreColor(analysis.analysis_score || 0)}`}>
+                      {analysis.analysis_score || 0}%
+                    </div>
+                    <Badge variant={status.variant} className={status.color}>
+                      {status.label}
+                    </Badge>
+                  </div>
                     </div>
                     
                     <div className="flex items-center justify-between pt-3 border-t border-border">
