@@ -19,9 +19,10 @@ interface LoanProduct {
 
 interface FundingOptionsProps {
   onBack: () => void;
+  onNavigateToForm?: (selectedLoans: string[]) => void;
 }
 
-export const FundingOptions = ({ onBack }: FundingOptionsProps) => {
+export const FundingOptions = ({ onBack, onNavigateToForm }: FundingOptionsProps) => {
   const [selectedLoans, setSelectedLoans] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
 
@@ -182,7 +183,16 @@ export const FundingOptions = ({ onBack }: FundingOptionsProps) => {
                   </ul>
                 </div>
 
-                <Button variant="premium" className="w-full" onClick={() => window.location.href = `/prequal/start?loan=${loan.id}`}>
+                <Button 
+                  variant="premium" 
+                  className="w-full" 
+                  onClick={() => {
+                    console.log('Get Pre-Qualified clicked for loan:', loan.id);
+                    if (onNavigateToForm) {
+                      onNavigateToForm([loan.id]);
+                    }
+                  }}
+                >
                   Get Pre-Qualified: {loan.name}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -277,12 +287,27 @@ export const FundingOptions = ({ onBack }: FundingOptionsProps) => {
                   {selectedLoans.length} loan{selectedLoans.length > 1 ? 's' : ''} selected
                 </span>
               </div>
-              {selectedLoans.length >= 2 && (
-                <Button variant="premium" onClick={handleCompare} className="w-full sm:w-auto">
-                  Compare Loans Side-by-Side
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {selectedLoans.length >= 2 && (
+                  <Button variant="outline" onClick={handleCompare} className="w-full sm:w-auto">
+                    Compare Side-by-Side
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+                <Button 
+                  variant="premium" 
+                  onClick={() => {
+                    console.log('Get Pre-Qualified clicked with selected loans:', selectedLoans);
+                    if (onNavigateToForm) {
+                      onNavigateToForm(selectedLoans);
+                    }
+                  }} 
+                  className="w-full sm:w-auto"
+                >
+                  Get Pre-Qualified: {selectedLoans.length} Loan{selectedLoans.length > 1 ? 's' : ''} Selected
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>

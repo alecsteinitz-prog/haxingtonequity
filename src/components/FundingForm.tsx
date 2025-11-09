@@ -20,9 +20,10 @@ import { useAuth } from "@/contexts/AuthContext";
 interface FundingFormProps {
   onBack: () => void;
   onSubmit: (data: any) => void;
+  preselectedLoanTypes?: string[];
 }
 
-export const FundingForm = ({ onBack, onSubmit }: FundingFormProps) => {
+export const FundingForm = ({ onBack, onSubmit, preselectedLoanTypes }: FundingFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { syncEligibilityScore } = useProfileSync();

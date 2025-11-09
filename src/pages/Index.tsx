@@ -23,6 +23,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [formData, setFormData] = useState<any>(null);
+  const [selectedLoanTypes, setSelectedLoanTypes] = useState<string[]>([]);
 
   // Debug logging
   console.log('Index render - appState:', appState, 'activeTab:', activeTab);
@@ -83,6 +84,13 @@ const Index = () => {
     setActiveTab("dashboard");
   };
 
+  const handleNavigateToFormFromLoans = (selectedLoans: string[]) => {
+    console.log('handleNavigateToFormFromLoans: Navigating to form with loans:', selectedLoans);
+    setSelectedLoanTypes(selectedLoans);
+    setAppState("form");
+    setActiveTab("analysis"); // Navigate to analysis tab to show the form
+  };
+
   const handleViewAnalysisDetails = (analysisId: string) => {
     // Navigate to analysis details - could be implemented later
     console.log('View analysis details:', analysisId);
@@ -103,6 +111,7 @@ const Index = () => {
       return (
         <FundingOptions 
           onBack={handleBackToDashboard}
+          onNavigateToForm={handleNavigateToFormFromLoans}
         />
       );
     }
@@ -143,6 +152,7 @@ const Index = () => {
             <FundingForm 
               onBack={handleBackToDashboard}
               onSubmit={handleFormSubmit}
+              preselectedLoanTypes={selectedLoanTypes}
             />
           );
         case "results":
