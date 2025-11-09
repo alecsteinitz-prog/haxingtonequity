@@ -24,6 +24,9 @@ const Index = () => {
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [formData, setFormData] = useState<any>(null);
 
+  // Debug logging
+  console.log('Index render - appState:', appState, 'activeTab:', activeTab);
+
   const handleStartAnalysis = () => {
     setAppState("form");
     setActiveTab("analysis");

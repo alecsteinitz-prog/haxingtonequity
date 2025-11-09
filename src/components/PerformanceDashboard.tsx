@@ -268,7 +268,10 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         </CardHeader>
         <CardContent className="grid gap-3">
           <Button 
-            onClick={onViewHistory}
+            onClick={() => {
+              console.log('Quick Action: View My Analysis History clicked');
+              onViewHistory();
+            }}
             variant="premium" 
             className="w-full justify-between"
           >
@@ -281,7 +284,10 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
           <Button 
             variant="premium"
             className="w-full justify-between"
-            onClick={onNavigateToImprove}
+            onClick={() => {
+              console.log('Quick Action: Boost Your Score clicked');
+              onNavigateToImprove?.();
+            }}
           >
             <span className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -292,7 +298,10 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
           <Button 
             variant="premium"
             className="w-full justify-between"
-            onClick={onNavigateToFundingOptions}
+            onClick={() => {
+              console.log('Quick Action: Discover Loan Options clicked');
+              onNavigateToFundingOptions?.();
+            }}
           >
             <span className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
