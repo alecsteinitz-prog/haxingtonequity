@@ -56,15 +56,21 @@ const Index = () => {
   };
 
   const handleViewHistory = () => {
+    console.log('handleViewHistory: Navigating to analysis-history');
     setAppState("analysis-history");
+    setActiveTab("dashboard"); // Keep on dashboard tab
   };
 
   const handleNavigateToImprove = () => {
+    console.log('handleNavigateToImprove: Navigating to analysis-improve');
     setAppState("analysis-improve");
+    setActiveTab("dashboard");
   };
 
   const handleNavigateToFundingOptions = () => {
+    console.log('handleNavigateToFundingOptions: Navigating to funding-options');
     setAppState("funding-options");
+    setActiveTab("dashboard");
   };
 
   const handleViewAnalysisDetails = (analysisId: string) => {

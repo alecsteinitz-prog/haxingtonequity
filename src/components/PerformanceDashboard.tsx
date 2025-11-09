@@ -58,19 +58,24 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('PerformanceDashboard: user state changed', user ? 'User exists' : 'No user');
     if (user) {
       fetchDashboardData();
     } else {
+      console.log('PerformanceDashboard: No user, setting loading to false');
       setLoading(false);
     }
   }, [user]);
 
   const fetchDashboardData = async () => {
+    console.log('fetchDashboardData: Starting fetch');
     if (!user) {
+      console.log('fetchDashboardData: No user found');
       setLoading(false);
       return;
     }
 
+    console.log('fetchDashboardData: Fetching for user', user.id);
     try {
       // Fetch all deal analyses for the user
       const { data: analyses, error } = await supabase
@@ -79,7 +84,12 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('fetchDashboardData: Supabase error', error);
+        throw error;
+      }
+
+      console.log('fetchDashboardData: Fetched analyses', analyses?.length || 0);
 
       if (analyses && analyses.length > 0) {
         // Calculate stats
@@ -141,10 +151,13 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
           categoryData,
           latestInsight: insight
         });
+      } else {
+        console.log('fetchDashboardData: No analyses found');
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
+      console.log('fetchDashboardData: Setting loading to false');
       setLoading(false);
     }
   };
