@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { InvestmentCalculator } from "@/components/InvestmentCalculator";
 
 interface DashboardStats {
   ongoingProjects: number;
@@ -286,6 +287,9 @@ export const PerformanceDashboard = ({ onStartAnalysis, onViewHistory, onNavigat
           </CardContent>
         </Card>
       </div>
+
+      {/* Investment Calculator */}
+      <InvestmentCalculator />
 
       {/* Ready to Get Started Section */}
       {stats.recentAnalyses.length === 0 && (
