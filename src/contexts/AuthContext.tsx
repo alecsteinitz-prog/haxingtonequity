@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (DEV_MODE) {
       console.log('🔧 Developer Mode Active - Using Mock User');
       const mockUser = {
-        id: 'dev_user_001',
+        id: '00000000-0000-0000-0000-000000000001',
         email: 'developer@test.com',
         user_metadata: {
           first_name: 'Dev',
