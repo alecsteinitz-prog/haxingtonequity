@@ -108,7 +108,10 @@ serve(async (req) => {
         state: property.state || state,
         price: estimatedPrice,
         arv: estimatedPrice > 0 ? Math.round(estimatedPrice * 1.15) : 0,
-        roi: monthlyRent > 0 && estimatedPrice > 0 ? Math.round((monthlyRent * 12 / estimatedPrice) * 100) : 25,
+        // Calculate ROI more realistically: assume 50% operating expenses, cash-on-cash return
+        roi: monthlyRent > 0 && estimatedPrice > 0 
+          ? Math.round(((monthlyRent * 12 * 0.5) / (estimatedPrice * 0.25)) * 100) // Assumes 25% down payment, 50% expense ratio
+          : 25,
         propertyType: property.propertyType || 'Apartment',
         imageUrl: property.photos?.[0] || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
         beds: property.bedrooms || 0,
@@ -117,6 +120,9 @@ serve(async (req) => {
         lat: property.latitude || 0,
         lng: property.longitude || 0,
         monthlyRent: monthlyRent,
+        grossYield: monthlyRent > 0 && estimatedPrice > 0 
+          ? Math.round((monthlyRent * 12 / estimatedPrice) * 100)
+          : 0,
       };
     });
     

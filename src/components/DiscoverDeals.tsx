@@ -25,6 +25,9 @@ interface PropertyDeal {
   sqft: number;
   lat: number;
   lng: number;
+  monthlyRent?: number;
+  grossYield?: number;
+  isPartialMatch?: boolean;
 }
 
 export const DiscoverDeals = () => {
@@ -92,44 +95,62 @@ export const DiscoverDeals = () => {
         });
       }
 
-      // Apply filters with more lenient logic
       const allDeals = data?.deals || [];
-      console.log("All deals before filtering:", allDeals);
       
-      const filteredDeals = allDeals.filter((deal: PropertyDeal) => {
+      // Separate exact matches and near matches
+      const exactMatches: PropertyDeal[] = [];
+      const nearMatches: PropertyDeal[] = [];
+      
+      allDeals.forEach((deal: PropertyDeal) => {
         // Always show properties without price data
         if (!deal.price || deal.price === 0) {
-          console.log(`Including ${deal.address} - no price data yet`);
-          return true;
+          exactMatches.push(deal);
+          return;
         }
         
-        // For properties with price data, check budget
-        if (deal.price > maxBudget[0]) {
-          console.log(`Filtering out ${deal.address} - price $${deal.price} exceeds budget $${maxBudget[0]}`);
-          return false;
-        }
+        const withinBudget = deal.price <= maxBudget[0];
+        const meetsROI = deal.roi >= minROI[0];
         
-        // Check ROI if available
-        if (deal.roi < minROI[0]) {
-          console.log(`Filtering out ${deal.address} - ROI ${deal.roi}% below minimum ${minROI[0]}%`);
-          return false;
+        if (withinBudget && meetsROI) {
+          exactMatches.push(deal);
+        } else {
+          // Near match criteria: within 20% of budget OR within 5% of ROI
+          const nearBudget = deal.price <= maxBudget[0] * 1.2;
+          const nearROI = deal.roi >= minROI[0] - 5;
+          
+          if ((withinBudget && nearROI) || (meetsROI && nearBudget) || (nearBudget && nearROI)) {
+            nearMatches.push({ ...deal, isPartialMatch: true });
+          }
         }
-        
-        return true;
       });
+      
+      // Prioritize exact matches, then show near matches if needed
+      let finalDeals: PropertyDeal[] = [];
+      let isShowingPartialMatches = false;
+      
+      if (exactMatches.length > 0) {
+        finalDeals = exactMatches;
+      } else if (nearMatches.length > 0) {
+        finalDeals = nearMatches;
+        isShowingPartialMatches = true;
+      }
 
-      console.log("Filtered deals:", filteredDeals.length);
-      setDeals(filteredDeals);
+      setDeals(finalDeals);
 
-      if (filteredDeals.length === 0) {
+      if (finalDeals.length === 0) {
         toast({
           title: "No Results",
-          description: `Found ${allDeals.length} properties, but none matched your filters. Try adjusting your budget (${maxBudget[0].toLocaleString()}) or minimum ROI (${minROI[0]}%).`,
+          description: `No properties found in ${city || 'this area'}. Try a different location or adjust your filters.`,
+        });
+      } else if (isShowingPartialMatches) {
+        toast({
+          title: "Similar Opportunities",
+          description: `We couldn't find exact matches, but here are ${finalDeals.length} similar properties. (Budget: $${maxBudget[0].toLocaleString()}, Min ROI: ${minROI[0]}%)`,
         });
       } else {
         toast({
           title: "Properties Found",
-          description: `Showing ${filteredDeals.length} of ${allDeals.length} properties`,
+          description: `Found ${finalDeals.length} properties matching your criteria`,
         });
       }
     } catch (error) {
@@ -395,7 +416,14 @@ export const DiscoverDeals = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {deals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
+              <div key={deal.id} className="relative">
+                {deal.isPartialMatch && (
+                  <div className="absolute top-2 left-2 z-10 bg-yellow-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                    Similar Match
+                  </div>
+                )}
+                <DealCard deal={deal} />
+              </div>
             ))}
           </div>
         </div>
