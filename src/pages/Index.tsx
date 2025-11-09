@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { PerformanceDashboard } from "@/components/PerformanceDashboard";
+import { FundingAnalysisCard } from "@/components/FundingAnalysisCard";
 import { FundingForm } from "@/components/FundingForm";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -84,7 +85,47 @@ const Index = () => {
       );
     }
     
-    if (activeTab !== "dashboard" && activeTab !== "analysis") {
+    // Analysis tab shows the original FundingAnalysisCard
+    if (activeTab === "analysis") {
+      switch (appState) {
+        case "form":
+          return (
+            <FundingForm 
+              onBack={handleBackToDashboard}
+              onSubmit={handleFormSubmit}
+            />
+          );
+        case "results":
+          return (
+            <div className="min-h-screen bg-background">
+              <AnalysisResults 
+                score={analysisData?.score || 75}
+                onBack={handleBackToDashboard}
+                onResubmit={handleResubmit}
+                analysisResult={analysisData?.analysisResult}
+                formData={formData}
+                onNavigateToFunding={handleNavigateToFunding}
+                dealAnalysisId={analysisData?.dealAnalysisId}
+              />
+              {analysisData?.dealAnalysisId && (
+                <div className="max-w-6xl mx-auto p-6">
+                  <LenderMatchingDashboard dealAnalysisId={analysisData.dealAnalysisId} />
+                </div>
+              )}
+            </div>
+          );
+        case "history":
+          return (
+            <DealHistory 
+              onBack={handleBackToDashboard}
+            />
+          );
+        default:
+          return <FundingAnalysisCard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
+      }
+    }
+    
+    if (activeTab !== "dashboard") {
       return (
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center">
@@ -95,42 +136,8 @@ const Index = () => {
       );
     }
 
-    switch (appState) {
-      case "form":
-        return (
-          <FundingForm 
-            onBack={handleBackToDashboard}
-            onSubmit={handleFormSubmit}
-          />
-        );
-      case "results":
-        return (
-          <div className="min-h-screen bg-background">
-            <AnalysisResults 
-              score={analysisData?.score || 75}
-              onBack={handleBackToDashboard}
-              onResubmit={handleResubmit}
-              analysisResult={analysisData?.analysisResult}
-              formData={formData}
-              onNavigateToFunding={handleNavigateToFunding}
-              dealAnalysisId={analysisData?.dealAnalysisId}
-            />
-            {analysisData?.dealAnalysisId && (
-              <div className="max-w-6xl mx-auto p-6">
-                <LenderMatchingDashboard dealAnalysisId={analysisData.dealAnalysisId} />
-              </div>
-            )}
-          </div>
-        );
-      case "history":
-        return (
-          <DealHistory 
-            onBack={handleBackToDashboard}
-          />
-        );
-      default:
-        return <PerformanceDashboard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
-    }
+    // Dashboard tab shows the new PerformanceDashboard
+    return <PerformanceDashboard onStartAnalysis={handleStartAnalysis} onViewHistory={handleViewHistory} />;
   };
 
   return (
