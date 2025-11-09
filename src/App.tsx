@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import { AuthPage } from "./pages/Auth";
 import { ProfilePage } from "./pages/Profile";
+import { MyDealsPage } from "./pages/MyDeals";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -42,6 +43,16 @@ const App = () => {
               <ProtectedRoute>
                 <AppLayout>
                   <ProfilePage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-deals"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <MyDealsPage />
                 </AppLayout>
               </ProtectedRoute>
             }

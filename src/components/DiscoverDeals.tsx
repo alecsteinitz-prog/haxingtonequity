@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { DealCard } from "./DealCard";
-import { Search, Filter, MapPin, DollarSign, Home, TrendingUp } from "lucide-react";
+import { Search, Filter, MapPin, DollarSign, Home, TrendingUp, Bookmark } from "lucide-react";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ interface PropertyDeal {
 
 export const DiscoverDeals = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [city, setCity] = useState("");
   const [state, setState] = useState("TX");
   const [country, setCountry] = useState("US");
@@ -168,11 +170,21 @@ export const DiscoverDeals = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Smart Deal Finder</h1>
-        <p className="text-muted-foreground">
-          Discover high-ROI investment properties from MLS and Zillow
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Smart Deal Finder</h1>
+          <p className="text-muted-foreground">
+            Discover high-ROI investment properties from MLS and Zillow
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => navigate('/my-deals')}
+          className="flex items-center gap-2"
+        >
+          <Bookmark className="h-4 w-4" />
+          My Saved Deals
+        </Button>
       </div>
 
       <Card>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -29,6 +30,7 @@ interface DealCardProps {
 
 export const DealCard = ({ deal }: DealCardProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -73,6 +75,14 @@ export const DealCard = ({ deal }: DealCardProps) => {
       toast({
         title: "Deal Saved!",
         description: "Property saved to your analysis history",
+        action: (
+          <button
+            onClick={() => navigate('/my-deals')}
+            className="text-sm underline"
+          >
+            View My Deals
+          </button>
+        ),
       });
     } catch (error) {
       console.error("Error saving deal:", error);
