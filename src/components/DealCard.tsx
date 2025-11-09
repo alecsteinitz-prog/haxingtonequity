@@ -38,20 +38,22 @@ export const DealCard = ({ deal }: DealCardProps) => {
   const handleSaveDeal = async () => {
     setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // TEMPORARY: Bypass auth for development
+      const devUserId = 'dev_user_001'; // Using dev mode user ID
       
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to save deals",
-          variant: "destructive",
-        });
-        return;
-      }
+      // const { data: { user } } = await supabase.auth.getUser();
+      // if (!user) {
+      //   toast({
+      //     title: "Authentication Required",
+      //     description: "Please sign in to save deals",
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
       // Save to deal_analyses table for future reference
       const { error } = await supabase.from("deal_analyses").insert({
-        user_id: user.id,
+        user_id: devUserId, // Using dev user ID instead of user.id
         property_address: `${deal.address}, ${deal.city}, ${deal.state}`,
         funding_amount: deal.price.toString(),
         property_type: deal.propertyType,
@@ -63,7 +65,10 @@ export const DealCard = ({ deal }: DealCardProps) => {
         funding_purpose: "Investment",
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error saving deal:", error);
+        throw error;
+      }
 
       toast({
         title: "Deal Saved!",
