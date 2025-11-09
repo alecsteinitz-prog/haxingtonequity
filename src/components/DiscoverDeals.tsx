@@ -89,10 +89,13 @@ export const DiscoverDeals = () => {
         });
       }
 
-      // Filter by minimum ROI
-      const filteredDeals = (data?.deals || []).filter((deal: PropertyDeal) => 
-        deal.roi >= minROI[0] && deal.price <= maxBudget[0]
-      );
+      // Filter by minimum ROI (only if we have price data)
+      const filteredDeals = (data?.deals || []).filter((deal: PropertyDeal) => {
+        // If no price data, include the property anyway
+        if (deal.price === 0) return true;
+        // If we have price data, apply ROI and budget filters
+        return deal.roi >= minROI[0] && deal.price <= maxBudget[0];
+      });
 
       setDeals(filteredDeals);
 
