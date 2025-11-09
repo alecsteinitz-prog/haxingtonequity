@@ -81,7 +81,7 @@ export const DealCard = ({ deal, mode = "save", onDelete }: DealCardProps) => {
         action: (
           <button
             onClick={() => navigate('/my-deals')}
-            className="text-sm underline"
+            className="text-base font-medium underline whitespace-nowrap hover:text-primary transition-colors"
           >
             View My Deals
           </button>
