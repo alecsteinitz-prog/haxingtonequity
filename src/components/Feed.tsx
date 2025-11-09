@@ -352,15 +352,17 @@ export const Feed = () => {
       </div>
 
       {/* Category Filters */}
-      <Tabs value={categoryFilter} onValueChange={setCategoryFilter} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          {CATEGORIES.map((category) => (
-            <TabsTrigger key={category.value} value={category.value}>
-              {category.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <div className="w-full -mx-4 px-4 md:mx-0 md:px-0">
+        <Tabs value={categoryFilter} onValueChange={setCategoryFilter} className="w-full">
+          <TabsList className="w-full justify-start">
+            {CATEGORIES.map((category) => (
+              <TabsTrigger key={category.value} value={category.value}>
+                {category.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Referral Banner */}
       <ReferralBanner />
