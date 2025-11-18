@@ -98,14 +98,28 @@ Return realistic property data based on the search criteria. If no exact matches
     if (!deepseekResponse.ok) {
       const errorText = await deepseekResponse.text();
       console.error('Deepseek API error:', deepseekResponse.status, errorText);
+      
+      let userMessage = 'Unable to search properties at this time.';
+      
+      if (deepseekResponse.status === 402) {
+        userMessage = 'Your Deepseek API account has insufficient balance. Please add funds to your Deepseek account to continue.';
+      } else if (deepseekResponse.status === 401) {
+        userMessage = 'Invalid Deepseek API key. Please check your API key configuration.';
+      } else if (deepseekResponse.status === 429) {
+        userMessage = 'Rate limit exceeded. Please wait a moment and try again.';
+      } else if (deepseekResponse.status >= 500) {
+        userMessage = 'Deepseek API is temporarily unavailable. Please try again in a few moments.';
+      }
+      
       return new Response(
         JSON.stringify({ 
-          error: `Deepseek API error: ${deepseekResponse.status}`,
+          error: userMessage,
           success: false,
-          deals: []
+          deals: [],
+          statusCode: deepseekResponse.status
         }), 
         { 
-          status: deepseekResponse.status, 
+          status: 200, // Return 200 so client can read the error message
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );

@@ -70,8 +70,8 @@ export const DiscoverDeals = () => {
       if (error) {
         console.error("Edge function error:", error);
         toast({
-          title: "Search Error",
-          description: "Failed to search for properties. Please try again.",
+          title: "Connection Error",
+          description: "Unable to connect to property search service. Please check your connection and try again.",
           variant: "destructive",
         });
         setDeals([]);
@@ -81,9 +81,9 @@ export const DiscoverDeals = () => {
 
       // Check for API-level errors
       if (data?.error) {
-        console.error("Deepseek API error:", data.error);
+        console.error("Property search error:", data.error, "Status code:", data?.statusCode);
         toast({
-          title: "API Error",
+          title: data?.statusCode === 402 ? "API Account Issue" : "Search Error",
           description: data.error,
           variant: "destructive",
         });
