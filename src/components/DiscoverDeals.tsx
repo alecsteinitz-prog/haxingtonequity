@@ -49,8 +49,12 @@ export const DiscoverDeals = () => {
 
   const handleSearch = async () => {
     setIsSearching(true);
+    setDeals([]);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('rentcast-deals', {
+      console.log('Starting property search with Deepseek API...');
+      
+      const { data, error } = await supabase.functions.invoke('zillow-deepseek-search', {
         body: {
           city: city || "Austin",
           state: state,
@@ -64,46 +68,55 @@ export const DiscoverDeals = () => {
       });
 
       if (error) {
-        console.error("Supabase function error:", error);
+        console.error("Edge function error:", error);
         toast({
-          title: "Connection Error",
-          description: "Failed to connect to the property search service. Please try again.",
+          title: "Search Error",
+          description: "Failed to search for properties. Please try again.",
           variant: "destructive",
         });
         setDeals([]);
+        setIsSearching(false);
         return;
       }
 
       // Check for API-level errors
       if (data?.error) {
-        console.error("Rentcast API error:", data.error);
+        console.error("Deepseek API error:", data.error);
         toast({
           title: "API Error",
           description: data.error,
           variant: "destructive",
         });
         setDeals([]);
+        setIsSearching(false);
         return;
       }
 
-      console.log("API Response:", data);
-      console.log("Deals received:", data?.deals?.length || 0);
+      console.log("Search results:", data);
+      const foundDeals = data?.deals || [];
+      console.log("Properties found:", foundDeals.length);
 
-      // Success message
-      if (data?.success && data?.message) {
+      if (foundDeals.length === 0) {
         toast({
-          title: "Success",
-          description: `${data.message} - Found ${data?.deals?.length || 0} properties`,
+          title: "No Results",
+          description: "No properties found matching your criteria. Try adjusting your filters.",
         });
+        setDeals([]);
+        setIsSearching(false);
+        return;
       }
 
-      const allDeals = data?.deals || [];
+      // Success message
+      toast({
+        title: "Search Complete",
+        description: `Found ${foundDeals.length} properties from Zillow`,
+      });
       
-      // Separate exact matches and near matches
+      // Filter deals based on criteria
       const exactMatches: PropertyDeal[] = [];
       const nearMatches: PropertyDeal[] = [];
       
-      allDeals.forEach((deal: PropertyDeal) => {
+      foundDeals.forEach((deal: PropertyDeal) => {
         // Always show properties without price data
         if (!deal.price || deal.price === 0) {
           exactMatches.push(deal);
@@ -116,47 +129,17 @@ export const DiscoverDeals = () => {
         if (withinBudget && meetsROI) {
           exactMatches.push(deal);
         } else {
-          // Near match criteria: within 20% of budget OR within 5% of ROI
-          const nearBudget = deal.price <= maxBudget[0] * 1.2;
-          const nearROI = deal.roi >= minROI[0] - 5;
-          
-          if ((withinBudget && nearROI) || (meetsROI && nearBudget) || (nearBudget && nearROI)) {
-            nearMatches.push({ ...deal, isPartialMatch: true });
-          }
+          deal.isPartialMatch = true;
+          nearMatches.push(deal);
         }
       });
       
-      // Prioritize exact matches, then show near matches if needed
-      let finalDeals: PropertyDeal[] = [];
-      let isShowingPartialMatches = false;
-      
-      if (exactMatches.length > 0) {
-        finalDeals = exactMatches;
-      } else if (nearMatches.length > 0) {
-        finalDeals = nearMatches;
-        isShowingPartialMatches = true;
-      }
+      // Combine exact matches first, then near matches
+      const combinedDeals = [...exactMatches, ...nearMatches];
+      setDeals(combinedDeals);
 
-      setDeals(finalDeals);
-
-      if (finalDeals.length === 0) {
-        toast({
-          title: "No Results",
-          description: `No properties found in ${city || 'this area'}. Try a different location or adjust your filters.`,
-        });
-      } else if (isShowingPartialMatches) {
-        toast({
-          title: "Similar Opportunities",
-          description: `We couldn't find exact matches, but here are ${finalDeals.length} similar properties. (Budget: $${maxBudget[0].toLocaleString()}, Min ROI: ${minROI[0]}%)`,
-        });
-      } else {
-        toast({
-          title: "Properties Found",
-          description: `Found ${finalDeals.length} properties matching your criteria`,
-        });
-      }
     } catch (error) {
-      console.error("Error fetching deals:", error);
+      console.error('Search error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
@@ -174,7 +157,7 @@ export const DiscoverDeals = () => {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Smart Deal Finder</h1>
           <p className="text-muted-foreground">
-            Discover high-ROI investment properties from MLS and Zillow
+            Discover high-ROI investment properties powered by Deepseek AI + Zillow
           </p>
         </div>
         <Button
