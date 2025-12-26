@@ -70,39 +70,61 @@ export const ProfilePage = () => {
   const [uploading, setUploading] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
+  // Check if we're in dev mode (mock user ID)
+  const isDevMode = user?.id === '00000000-0000-0000-0000-000000000001' || !user;
+
   useEffect(() => {
-    // For development mode without auth, create a mock profile
-    if (!user) {
+    // For development mode, create a mock profile
+    if (isDevMode) {
       console.log('[DEV MODE] Creating mock profile for development');
       const mockProfile: Profile = {
-        user_id: 'mock-user-dev',
-        email: 'developer@haxingtonequity.com',
+        user_id: user?.id || 'mock-user-dev',
+        email: user?.email || 'developer@haxingtonequity.com',
         first_name: 'Dev',
-        last_name: 'Mode',
+        last_name: 'User',
         display_name: 'Dev User',
         avatar_url: '',
         experience_level: '4-10_deals',
         property_focus: ['Single Family', 'Fix & Flip', 'BRRRR'],
         actively_seeking_funding: true,
-        profile_bio: 'This is a development mode profile. Sign in to see real data.',
+        profile_bio: 'This is a development mode profile. Sign in with a real account to see your actual data.',
         funding_eligibility_score: 85,
         last_eligibility_update: new Date().toISOString()
       };
-      setProfile(mockProfile);
-      setDeals([]);
-      setLoading(false);
       
-      toast.success('DEV MODE: Viewing mock profile', {
-        description: 'Authentication disabled for development',
-        duration: 3000
-      });
+      const mockDeals: Deal[] = [
+        {
+          id: 'mock-deal-1',
+          property_type: 'Single Family',
+          city: 'Austin',
+          state: 'TX',
+          deal_status: 'Closed',
+          deal_value: 350000,
+          profit_amount: 45000,
+          close_date: '2024-06-15',
+          created_at: '2024-01-10T00:00:00Z'
+        },
+        {
+          id: 'mock-deal-2',
+          property_type: 'Fix & Flip',
+          city: 'Dallas',
+          state: 'TX',
+          deal_status: 'In Progress',
+          deal_value: 275000,
+          created_at: '2024-09-20T00:00:00Z'
+        }
+      ];
+      
+      setProfile(mockProfile);
+      setDeals(mockDeals);
+      setLoading(false);
       return;
     }
     
     // Normal authenticated flow
     fetchProfile();
     fetchDeals();
-  }, [user]);
+  }, [user, isDevMode]);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -146,7 +168,7 @@ export const ProfilePage = () => {
     if (!profile) return;
     
     // DEV MODE: Just update local state without saving to database
-    if (!user) {
+    if (isDevMode) {
       console.log('[DEV MODE] Profile update (not saved):', updates);
       setProfile({ ...profile, ...updates });
       toast.success('DEV MODE: Profile updated locally', {
@@ -197,9 +219,9 @@ export const ProfilePage = () => {
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // DEV MODE: Disable avatar upload
-    if (!user) {
+    if (isDevMode) {
       toast.info('DEV MODE: Avatar upload disabled', {
-        description: 'Sign in to upload avatars',
+        description: 'Sign in with a real account to upload avatars',
       });
       return;
     }
@@ -263,10 +285,10 @@ export const ProfilePage = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* DEV MODE Banner */}
-      {!user && (
+      {isDevMode && (
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 text-center">
           <p className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
-            🔧 DEV MODE: Viewing mock profile data. Sign in to see real profile.
+            🔧 DEV MODE: Viewing mock profile data. Sign in with a real account to see your actual profile.
           </p>
         </div>
       )}
