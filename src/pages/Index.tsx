@@ -7,7 +7,7 @@ import { FundingForm } from "@/components/FundingForm";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { DealHistory } from "@/components/DealHistory";
-import { Resources } from "@/components/Resources";
+import { LearningTab } from "@/components/learning/LearningTab";
 import { Feed } from "@/components/Feed";
 import { ProfilePage } from "@/pages/Profile";
 import { LenderMatchingDashboard } from "@/components/LenderMatchingDashboard";
@@ -135,8 +135,8 @@ const Index = () => {
       );
     }
 
-    if (activeTab === "resources") {
-      return <Resources />;
+    if (activeTab === "learning") {
+      return <LearningTab />;
     }
     
     if (activeTab === "profile") {
