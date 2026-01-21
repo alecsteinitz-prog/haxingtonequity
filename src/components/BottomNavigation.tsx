@@ -13,7 +13,7 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
     { id: "discover", label: "Discover", icon: Search },
     { id: "analysis", label: "Analysis", icon: FileText },
     { id: "feed", label: "Feed", icon: MessageCircle },
-    { id: "resources", label: "Resources", icon: BookOpen },
+    { id: "learning", label: "Learning", icon: BookOpen },
     { id: "profile", label: "Profile", icon: User },
   ];
 
